@@ -57,19 +57,15 @@ export const Cube = memo(
       if (cubeRef.current) {
         const cubePosition = new Vector3(...position)
         const distance = cubePosition.distanceTo(camera.position)
-        setOpacity(
-          Math.min(1, Math.max(0, 1 - (distance / FOG_DISTANCE) * 1.2)).toFixed(
-            2,
-          ),
-        )
+        setOpacity(clamp(1 - (distance / FOG_DISTANCE) * 1.2, 0, 1).toFixed(2))
       }
     })
 
     const outlineOpacity =
       isHovered || props.isSelected
-        ? 1
+        ? +opacity * 20
         : props.isDimmed || isEmpty
-        ? +opacity / 2
+        ? clamp(+opacity, 0.05, 0.08)
         : +opacity
 
     const text =
@@ -99,7 +95,7 @@ export const Cube = memo(
           position={[0, 0, 0]}
           fontSize={0.2}
           material={new MeshBasicMaterial({ fog: false })}
-          fillOpacity={!props.isRevealed && isHovered ? 1 : +opacity}
+          fillOpacity={props.isRevealed && isHovered ? +opacity * 20 : +opacity}
           color="#ffffff"
           anchorX="center"
           anchorY="middle"
@@ -111,3 +107,6 @@ export const Cube = memo(
     )
   },
 )
+
+const clamp = (number: number, min: number, max: number) =>
+  Math.max(min, Math.min(number, max))
