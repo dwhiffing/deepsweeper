@@ -2,7 +2,7 @@ import { useBox, Triplet } from '@react-three/cannon'
 import { Outlines, Text } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { memo, useRef, useState } from 'react'
-import { Mesh, Vector3 } from 'three'
+import { Mesh, MeshBasicMaterial, Vector3 } from 'three'
 import { FOG_DISTANCE } from '../scene/DefaultScene'
 
 export type Cube = {
@@ -77,7 +77,8 @@ export const Cube = memo(
             ref={textRef}
             position={[0, 0, 0]}
             fontSize={0.2}
-            fillOpacity={+opacity * 4}
+            material={new MeshBasicMaterial({ fog: false })}
+            fillOpacity={isHovered ? 1 : +opacity}
             color="#ffffff"
             anchorX="center"
             anchorY="middle"
