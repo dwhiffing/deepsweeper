@@ -88,15 +88,16 @@ export const DefaultScene = (props: {
     if (groupRef.current) {
       const raycaster = new Raycaster()
       raycaster.setFromCamera(new Vector2(0, 0), camera) // center of screen
-      const intersects = raycaster.intersectObjects(groupRef.current.children)
+      const children = groupRef.current.children
+      const intersects = raycaster.intersectObjects(children)
 
-      // highlights all cubes adjcent to the hovered cube
+      // highlights all cubes adjacent to the hovered cube
       const uuid = intersects[0]?.object.uuid ?? ''
       const cube = boxes.find((b) => b.uuid == uuid)
       const adjacent = cube ? getAdjacent(cube, ref.current.cubeMap) : []
       const ids = [uuid, ...adjacent.map((c) => c.uuid)]
       if (activeBoxes.join(':') !== ids.join(':')) {
-        setActiveBoxes(ids)
+        setActiveBoxes(ids.filter(Boolean))
       }
     }
   })
@@ -117,11 +118,17 @@ export const DefaultScene = (props: {
       <pointerLockControls ref={controls} args={[camera, gl.domElement]} />
       <directionalLight
         color="#ffffff"
-        position={[10, 10, 10]}
-        intensity={0.5}
+        position={[0, 10, 10]}
+        intensity={1.5}
         castShadow
       />
-      <ambientLight color="#404040" intensity={0.6} />
+      <directionalLight
+        color="#ffffff"
+        position={[10, 10, 0]}
+        intensity={1}
+        castShadow
+      />
+      <ambientLight color="#404040" intensity={2.5} />
       <Physics
         gravity={[0, -1.5, 0]}
         tolerance={0}
@@ -139,6 +146,10 @@ export const DefaultScene = (props: {
               isRevealed={revealed.has(cube.uuid)}
               isFlagged={flagged.has(cube.uuid)}
               isHovered={activeBoxes.includes(cube.uuid)}
+              isDimmed={
+                activeBoxes.length > 0 && !activeBoxes.includes(cube.uuid)
+              }
+              isSelected={activeBoxes[0] === cube.uuid}
               onCollide={onCollide}
             />
           ))}

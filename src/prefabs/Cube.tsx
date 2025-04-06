@@ -19,23 +19,25 @@ export const Cube = memo(
   (props: {
     cube: Cube
     isHovered?: boolean
+    isSelected?: boolean
+    isDimmed?: boolean
     isRevealed?: boolean
     isFlagged?: boolean
     onCollide?: (cube: Cube) => void
   }) => {
     const { position, isMine, uuid } = props.cube
-    const isSolid = isMine
     const [isColliding, setIsColliding] = useState(false)
     const [opacity, setOpacity] = useState<string>('0')
     const isHovered = props.isHovered
 
+    const isEmpty = props.isRevealed && props.cube.number === 0 && !isMine
     const [cubeRef] = useBox(() => ({
       mass: 1,
       args: [0.5, 0.5, 0.5],
       material: { friction: 1, restitution: 0 },
       position,
       type: 'Static',
-      isTrigger: !isSolid,
+      isTrigger: !isEmpty,
       onCollide: () => {
         setIsColliding(true)
         props.onCollide?.(props.cube)
@@ -61,21 +63,35 @@ export const Cube = memo(
       }
     })
 
+    const size = isEmpty ? 0.175 : 0.5
+    const outlineOpacity =
+      isHovered || props.isSelected
+        ? 1
+        : props.isDimmed || isEmpty
+        ? +opacity / 2
+        : +opacity
+
+    const text = props.isFlagged
+      ? 'F'
+      : props.isRevealed && props.cube.number !== 0
+      ? props.cube.number
+      : ''
+
     return (
       <mesh ref={cubeRef} uuid={uuid} castShadow>
-        <boxGeometry args={[0.5, 0.5, 0.5]} />
+        <boxGeometry args={[size, size, size]} />
         <meshLambertMaterial
-          opacity={isSolid && props.isRevealed ? 1 : 0}
+          opacity={(isMine && props.isRevealed) || isEmpty ? 1 : 0}
           transparent
           depthTest
-          color={isMine ? '#ff0000' : '#0077ff'}
+          color={isMine ? '#ff0000' : '#3aa'}
         />
         {!isColliding && (
           <Outlines
-            thickness={isHovered ? 5 : isSolid && props.isRevealed ? 0 : 2}
-            color={isHovered ? '#fff' : '#fff'}
+            thickness={props.isSelected ? 6 : 2}
+            color={props.isSelected ? '#ff0' : '#fff'}
             transparent
-            opacity={isHovered ? +opacity * 3 : +opacity}
+            opacity={outlineOpacity}
           />
         )}
         <Text
@@ -90,7 +106,7 @@ export const Cube = memo(
           anchorX="center"
           anchorY="middle"
         >
-          {props.isFlagged ? 'F' : props.isRevealed ? props.cube.number : ''}
+          {text}
         </Text>
       </mesh>
     )
