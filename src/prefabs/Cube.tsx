@@ -4,7 +4,12 @@ import { useFrame } from '@react-three/fiber'
 import { memo, useRef, useState } from 'react'
 import { Mesh, Vector3 } from 'three'
 
-export type Cube = { position: Triplet; isMine: boolean; uuid: string }
+export type Cube = {
+  position: Triplet
+  isMine: boolean
+  uuid: string
+  number: number
+}
 export const Cube = memo(
   (props: {
     cube: Cube
@@ -72,7 +77,7 @@ export const Cube = memo(
             anchorX="center"
             anchorY="middle"
           >
-            4
+            {props.cube.number}
           </Text>
         )}
       </mesh>

@@ -3,7 +3,6 @@ import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Vector3 } from 'three'
 import { useKeyboardInput } from '../hooks/useKeyboardInput'
-import { useMouseInput } from '../hooks/useMouseInput'
 import { useVariable } from '../hooks/useVariable'
 
 /** Player movement constants */
@@ -21,9 +20,7 @@ export const Player = () => {
   }))
 
   const pressed = useKeyboardInput(['w', 'a', 's', 'd', ' '])
-  const pressedMouse = useMouseInput()
   const input = useVariable(pressed)
-  const mouseInput = useVariable(pressedMouse)
 
   const { camera } = useThree()
 
@@ -93,10 +90,6 @@ export const Player = () => {
 
     if (space) {
       api.velocity.set(state.current.vel[0], jumpSpeed, state.current.vel[2])
-    }
-
-    if (mouseInput.current.left) {
-      console.log('click')
     }
   })
 

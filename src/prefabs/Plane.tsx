@@ -13,7 +13,7 @@ export const Plane = () => {
   return (
     <mesh ref={ref} receiveShadow={true} scale={[100, 100, 100]}>
       <planeGeometry />
-      <meshPhongMaterial color={'#419'} />
+      <meshPhongMaterial color="#417" />
     </mesh>
   )
 }

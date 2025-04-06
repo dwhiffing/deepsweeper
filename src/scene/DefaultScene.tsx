@@ -7,6 +7,7 @@ import { Player } from '../prefabs/Player'
 import { Cube } from '../prefabs/Cube'
 import { Group, Raycaster, Vector2 } from 'three'
 import { v4 as uuidv4 } from 'uuid'
+import { useMouseInput } from '../hooks/useMouseInput'
 
 extend({ PointerLockControls })
 
@@ -25,7 +26,7 @@ const getBoxes = () => {
             y * sp - gridSize / 2 + 0.5 + 4,
             z * sp - gridSize / 2 + 0.5,
           ] as Triplet,
-
+          number: 4,
           revealed: false,
           isMine: Math.random() <= 0.1,
         })
@@ -38,7 +39,7 @@ const getBoxes = () => {
 export const DefaultScene = (props: { onGameOver: () => void }) => {
   const { camera, gl } = useThree()
   const controls = useRef<PointerLockControls>(null)
-  const [boxes] = useState(getBoxes())
+  const [boxes, setBoxes] = useState(getBoxes())
   const [activeBox, setActiveBox] = useState<string | null>(null)
   const groupRef = useRef<Group>(null)
 
@@ -52,6 +53,14 @@ export const DefaultScene = (props: { onGameOver: () => void }) => {
       document.removeEventListener('click', handleFocus)
     }
   }, [gl])
+
+  useMouseInput(() => {
+    setBoxes((b) =>
+      b.map((_b) =>
+        _b.uuid === activeBox ? { ..._b, number: _b.number - 1 } : _b,
+      ),
+    )
+  })
 
   useFrame(({ camera }) => {
     if (groupRef.current) {
