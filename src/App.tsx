@@ -5,14 +5,17 @@ import { DefaultScene } from './scene/DefaultScene'
 import './index.css'
 import { useState } from 'react'
 
+const DEBUG = false
+
 export default function App() {
-  const [gameStarted, setGameStarted] = useState(false)
+  const [gameStarted, setGameStarted] = useState(DEBUG)
+
   return gameStarted ? (
     <>
       <UI>
         <Crosshair />
       </UI>
-      <Canvas style={{ backgroundColor: '#111' }}>
+      <Canvas style={{ backgroundColor: '#001' }}>
         <DefaultScene onGameOver={() => setGameStarted(false)} />
       </Canvas>
     </>

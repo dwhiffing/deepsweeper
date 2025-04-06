@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
-import { Physics } from '@react-three/cannon'
-import { extend, useThree } from '@react-three/fiber'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Physics, Triplet } from '@react-three/cannon'
+import { extend, useFrame, useThree } from '@react-three/fiber'
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js'
 import { Plane } from '../prefabs/Plane'
 import { Player } from '../prefabs/Player'
 import { Cube } from '../prefabs/Cube'
+import { Group, Raycaster, Vector2 } from 'three'
+import { v4 as uuidv4 } from 'uuid'
 
 extend({ PointerLockControls })
 
@@ -17,27 +19,28 @@ const getBoxes = () => {
     for (let y = 0; y < gridSize; y++) {
       for (let z = 0; z < gridSize; z++) {
         boxes.push({
-          x: x * sp - gridSize / 2 + 0.5,
-          y: y * sp - gridSize / 2 + 0.5 + 4,
-          z: z * sp - gridSize / 2 + 0.5,
+          uuid: uuidv4(),
+          position: [
+            x * sp - gridSize / 2 + 0.5,
+            y * sp - gridSize / 2 + 0.5 + 4,
+            z * sp - gridSize / 2 + 0.5,
+          ] as Triplet,
+
           revealed: false,
           isMine: Math.random() <= 0.1,
         })
       }
     }
   }
-  return boxes
+  return boxes as Cube[]
 }
 
 export const DefaultScene = (props: { onGameOver: () => void }) => {
   const { camera, gl } = useThree()
   const controls = useRef<PointerLockControls>(null)
   const [boxes] = useState(getBoxes())
-
-  // useEffect(() => {
-  // camera.layers.enable(0)
-  // camera.layers.enable(1)
-  // }, [camera])
+  const [activeBox, setActiveBox] = useState<string | null>(null)
+  const groupRef = useRef<Group>(null)
 
   useEffect(() => {
     const handleFocus = () => {
@@ -49,6 +52,23 @@ export const DefaultScene = (props: { onGameOver: () => void }) => {
       document.removeEventListener('click', handleFocus)
     }
   }, [gl])
+
+  useFrame(({ camera }) => {
+    if (groupRef.current) {
+      const raycaster = new Raycaster()
+      raycaster.setFromCamera(new Vector2(0, 0), camera) // center of screen
+      const intersects = raycaster.intersectObjects(groupRef.current.children)
+      setActiveBox(intersects[0]?.object.uuid ?? '')
+    }
+  })
+
+  const onGameOver = props.onGameOver
+  const onCollide = useCallback(
+    (cube: Cube) => {
+      if (cube.isMine) onGameOver()
+    },
+    [onGameOver],
+  )
 
   return (
     <>
@@ -70,17 +90,16 @@ export const DefaultScene = (props: { onGameOver: () => void }) => {
       >
         <Player />
         <Plane />
-        {boxes.map((cube, i) => (
-          <Cube
-            key={i}
-            position={[cube.x, cube.y, cube.z]}
-            isMine={cube.isMine}
-            isSolid={cube.isMine}
-            onCollide={() => {
-              if (cube.isMine) props.onGameOver()
-            }}
-          />
-        ))}
+        <group ref={groupRef}>
+          {boxes.map((cube, i) => (
+            <Cube
+              key={i}
+              cube={cube}
+              isHovered={cube.uuid === activeBox}
+              onCollide={onCollide}
+            />
+          ))}
+        </group>
       </Physics>
     </>
   )
