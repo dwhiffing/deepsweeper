@@ -29,7 +29,7 @@ const getBoxes = () => {
   return boxes
 }
 
-export const DefaultScene = () => {
+export const DefaultScene = (props: { onGameOver: () => void }) => {
   const { camera, gl } = useThree()
   const controls = useRef<PointerLockControls>(null)
   const [boxes] = useState(getBoxes())
@@ -77,7 +77,7 @@ export const DefaultScene = () => {
             isMine={cube.isMine}
             isSolid={cube.isMine}
             onCollide={() => {
-              console.log(cube.isMine)
+              if (cube.isMine) props.onGameOver()
             }}
           />
         ))}

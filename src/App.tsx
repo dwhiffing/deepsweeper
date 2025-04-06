@@ -3,16 +3,27 @@ import { Crosshair } from './components/Crosshair'
 import { UI } from './components/UI'
 import { DefaultScene } from './scene/DefaultScene'
 import './index.css'
+import { useState } from 'react'
 
 export default function App() {
-  return (
+  const [gameStarted, setGameStarted] = useState(false)
+  return gameStarted ? (
     <>
       <UI>
         <Crosshair />
       </UI>
       <Canvas style={{ backgroundColor: '#111' }}>
-        <DefaultScene />
+        <DefaultScene onGameOver={() => setGameStarted(false)} />
       </Canvas>
     </>
+  ) : (
+    <div className="flex justify-center items-center h-screen">
+      <button
+        className="bg-white border rounded-md px-4 py-2 cursor-pointer"
+        onClick={() => setGameStarted(true)}
+      >
+        Start Game
+      </button>
+    </div>
   )
 }
