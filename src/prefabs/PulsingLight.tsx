@@ -1,5 +1,3 @@
-import { useFrame, useThree } from '@react-three/fiber'
-import { useState } from 'react'
 import { useMemo } from 'react'
 import { shaderMaterial } from '@react-three/drei'
 // @ts-expect-error hmm
@@ -109,26 +107,14 @@ export const FakeGlowMaterial = ({
 }
 
 export const PulsingLight = () => {
-  const { clock } = useThree()
-  const t = clock.getElapsedTime()
-  const [falloff, setFalloff] = useState((2 + Math.sin(t * 8)) * 3)
-  const size = 0.1
-
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime()
-
-    const f = (2 + Math.sin(t * 8)) * 3
-    setFalloff(f)
-  })
-
   return (
     <mesh position={[0, 0, 0]}>
-      <sphereGeometry args={[size, 16, 16]} />
+      <sphereGeometry args={[0.2, 16, 16]} />
       <meshStandardMaterial />
       <FakeGlowMaterial
-        glowColor="#ff0000"
-        glowInternalRadius={0.5}
-        falloff={falloff}
+        glowColor="#aa0000"
+        glowInternalRadius={4}
+        falloff={2}
       />
     </mesh>
   )
