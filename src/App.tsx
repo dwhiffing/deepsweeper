@@ -4,13 +4,12 @@ import { UI } from './components/UI'
 import { DefaultScene } from './scene/DefaultScene'
 import './index.css'
 import { useEffect, useState } from 'react'
-
-export const DEBUG = false
-const DUR = 1000
+import { DEBUG, DUR } from './utils/constants'
 
 export default function App() {
   const [gameStarted, setGameStarted] = useState(DEBUG)
   const [gameFade, setGameFade] = useState(false)
+  const [gameState, setGameState] = useState('')
   const [menuFade, setMenuFade] = useState(false)
   useEffect(() => {
     setTimeout(() => setGameFade(gameStarted), DUR)
@@ -30,8 +29,9 @@ export default function App() {
       </UI>
       <Canvas style={{ backgroundColor: '#001' }}>
         <DefaultScene
-          onGameOver={() => {
+          onGameOver={(state: string) => {
             setGameFade(false)
+            setGameState(state)
 
             setTimeout(() => {
               setGameStarted(false)
@@ -51,15 +51,18 @@ export default function App() {
           pointerEvents: menuFade ? 'auto' : 'none',
         }}
       />
-      <button
-        className="bg-white border rounded-md px-4 py-2 cursor-pointer"
-        onClick={() => {
-          setMenuFade(true)
-          setTimeout(() => setGameStarted(true), DUR)
-        }}
-      >
-        Start Game
-      </button>
+      <div className="flex flex-col items-center gap-4">
+        <p className="text-white">{gameState}</p>
+        <button
+          className="bg-white border rounded-md px-4 py-2 cursor-pointer"
+          onClick={() => {
+            setMenuFade(true)
+            setTimeout(() => setGameStarted(true), DUR)
+          }}
+        >
+          Start Game
+        </button>
+      </div>
     </div>
   )
 }

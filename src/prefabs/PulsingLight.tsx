@@ -111,7 +111,7 @@ export const FakeGlowMaterial = ({
 export const PulsingLight = () => {
   const [falloff, setFalloff] = useState(0)
 
-  const size = 0.1
+  const size = 0.5
   // const [size, setSize] = useState(0.1)
 
   useFrame(({ clock }) => {
@@ -122,7 +122,7 @@ export const PulsingLight = () => {
   })
 
   return (
-    <mesh position={[0, 3, 0]}>
+    <mesh position={[0, 0, 0]}>
       <sphereGeometry args={[size, 16, 16]} />
       <meshStandardMaterial />
       <FakeGlowMaterial

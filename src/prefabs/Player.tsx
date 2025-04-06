@@ -14,7 +14,7 @@ export const Player = () => {
   const [_sphereRef, api] = useSphere(() => ({
     mass: 100,
     fixedRotation: true,
-    position: [10, 0, 10],
+    position: [4, 0, 4],
     args: [0.2],
     material: { friction: 0 },
   }))
@@ -32,7 +32,7 @@ export const Player = () => {
   useEffect(() => {
     api.velocity.subscribe((v) => (state.current.vel = v))
     api.position.subscribe((v) => (state.current.pos = v))
-    camera.lookAt(new Vector3(-10, 10, -10))
+    camera.lookAt(new Vector3(-4, 0, 0))
   }, [api, camera])
 
   useFrame((_, delta) => {

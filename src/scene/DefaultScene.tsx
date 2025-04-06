@@ -1,48 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Physics, Triplet } from '@react-three/cannon'
+import { Physics } from '@react-three/cannon'
 import { extend, useFrame, useThree } from '@react-three/fiber'
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js'
 import { Plane } from '../prefabs/Plane'
 import { Player } from '../prefabs/Player'
 import { Cube } from '../prefabs/Cube'
 import { Group, Raycaster, Vector2 } from 'three'
-import { v4 as uuidv4 } from 'uuid'
 import { useMouseInput } from '../hooks/useMouseInput'
-import { DEBUG } from '../App'
+import { getAdjacent, getBoxes } from '../utils'
+import { DEBUG, FOG_DISTANCE } from '../utils/constants'
 
 extend({ PointerLockControls })
 
-export const FOG_DISTANCE = 6
-const gridSize = 5
-const sp = 2
-const getBoxes = () => {
-  const boxes = []
-
-  for (let x = 0; x < gridSize; x++) {
-    for (let y = 0; y < gridSize; y++) {
-      for (let z = 0; z < gridSize; z++) {
-        boxes.push({
-          uuid: uuidv4(),
-          position: [
-            x * sp - gridSize / 2 + 0.5,
-            y * sp - gridSize / 2 + 0.5 + 4,
-            z * sp - gridSize / 2 + 0.5,
-          ] as Triplet,
-          number: 4,
-          revealed: false,
-          isMine: Math.random() <= 0.1,
-        })
-      }
-    }
-  }
-  return boxes as Cube[]
-}
-
-export const DefaultScene = (props: { onGameOver: () => void }) => {
+export const DefaultScene = (props: {
+  onGameOver: (state: string) => void
+}) => {
   const { camera, gl } = useThree()
   const controls = useRef<PointerLockControls>(null)
-  const [boxes, setBoxes] = useState(getBoxes())
-  const [activeBox, setActiveBox] = useState<string | null>(null)
+  const ref = useRef(getBoxes())
+  const boxes = ref.current.boxes
+  const [revealed, setRevealed] = useState<Set<string>>(new Set())
+  const [flagged, setFlagged] = useState<Set<string>>(new Set())
+  const [activeBoxes, setActiveBoxes] = useState<string[]>([])
   const groupRef = useRef<Group>(null)
 
   useEffect(() => {
@@ -54,12 +33,55 @@ export const DefaultScene = (props: { onGameOver: () => void }) => {
     }
   }, [])
 
-  useMouseInput(() => {
-    setBoxes((b) =>
-      b.map((_b) =>
-        _b.uuid === activeBox ? { ..._b, number: _b.number - 1 } : _b,
-      ),
-    )
+  useMouseInput((button: number) => {
+    const uuid = activeBoxes[0]
+    const cube = boxes.find((b) => b.uuid == uuid)
+
+    // if right click, flag cube
+    if (button === 2) {
+      // if cube is already revealed, we cant flag it
+      if (revealed.has(uuid)) return
+
+      setFlagged((f) => {
+        // toggle flag
+        if (f.has(uuid)) {
+          f.delete(uuid)
+        } else {
+          f.add(uuid)
+        }
+
+        // if all mines are flagged, you win
+        if (boxes.filter((b) => b.isMine).every((b) => f.has(b.uuid))) {
+          props.onGameOver('win')
+        }
+        return new Set(f)
+      })
+
+      return
+    }
+
+    // if you reveal a mine, you lose
+    setTimeout(() => {
+      if (cube?.isMine) props.onGameOver('lose')
+    }, 500)
+
+    // if you try to reveal a flagged cube, bail
+    if (flagged.has(uuid)) return
+
+    // if you reveal a revealed cube that is marked 0, reveal all adjacent
+    if (revealed.has(uuid) && cube && cube.number === 0) {
+      const neighbors = getAdjacent(cube, ref.current.cubeMap)
+      setRevealed((r) => {
+        neighbors.forEach((n) => r.add(n.uuid))
+        return new Set(r)
+      })
+    } else {
+      // else just reveal that cube
+      setRevealed((r) => {
+        r.add(uuid)
+        return new Set(r)
+      })
+    }
   })
 
   useFrame(({ camera }) => {
@@ -67,14 +89,22 @@ export const DefaultScene = (props: { onGameOver: () => void }) => {
       const raycaster = new Raycaster()
       raycaster.setFromCamera(new Vector2(0, 0), camera) // center of screen
       const intersects = raycaster.intersectObjects(groupRef.current.children)
-      setActiveBox(intersects[0]?.object.uuid ?? '')
+
+      // highlights all cubes adjcent to the hovered cube
+      const uuid = intersects[0]?.object.uuid ?? ''
+      const cube = boxes.find((b) => b.uuid == uuid)
+      const adjacent = cube ? getAdjacent(cube, ref.current.cubeMap) : []
+      const ids = [uuid, ...adjacent.map((c) => c.uuid)]
+      if (activeBoxes.join(':') !== ids.join(':')) {
+        setActiveBoxes(ids)
+      }
     }
   })
 
   const onGameOver = props.onGameOver
   const onCollide = useCallback(
     (cube: Cube) => {
-      if (cube.isMine) onGameOver()
+      if (cube.isMine) onGameOver('lose')
     },
     [onGameOver],
   )
@@ -106,7 +136,9 @@ export const DefaultScene = (props: { onGameOver: () => void }) => {
             <Cube
               key={i}
               cube={cube}
-              isHovered={cube.uuid === activeBox}
+              isRevealed={revealed.has(cube.uuid)}
+              isFlagged={flagged.has(cube.uuid)}
+              isHovered={activeBoxes.includes(cube.uuid)}
               onCollide={onCollide}
             />
           ))}

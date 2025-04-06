@@ -3,10 +3,14 @@ import { Outlines, Text } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { memo, useRef, useState } from 'react'
 import { Mesh, MeshBasicMaterial, Vector3 } from 'three'
-import { FOG_DISTANCE } from '../scene/DefaultScene'
+import { FOG_DISTANCE } from '../utils/constants'
 
 export type Cube = {
   position: Triplet
+  x: number
+  y: number
+  z: number
+  revealed: boolean
   isMine: boolean
   uuid: string
   number: number
@@ -15,13 +19,15 @@ export const Cube = memo(
   (props: {
     cube: Cube
     isHovered?: boolean
+    isRevealed?: boolean
+    isFlagged?: boolean
     onCollide?: (cube: Cube) => void
   }) => {
     const { position, isMine, uuid } = props.cube
     const isSolid = isMine
     const [isColliding, setIsColliding] = useState(false)
     const [opacity, setOpacity] = useState<string>('0')
-    const isHovered = props.isHovered && +opacity > 0.05
+    const isHovered = props.isHovered
 
     const [cubeRef] = useBox(() => ({
       mass: 1,
@@ -59,33 +65,33 @@ export const Cube = memo(
       <mesh ref={cubeRef} uuid={uuid} castShadow>
         <boxGeometry args={[0.5, 0.5, 0.5]} />
         <meshLambertMaterial
-          opacity={isSolid ? 1 : 0}
+          opacity={isSolid && props.isRevealed ? 1 : 0}
           transparent
           depthTest
           color={isMine ? '#ff0000' : '#0077ff'}
         />
         {!isColliding && (
           <Outlines
-            thickness={isHovered ? 5 : isSolid ? 0 : 2}
-            color={'#fff'}
+            thickness={isHovered ? 5 : isSolid && props.isRevealed ? 0 : 2}
+            color={isHovered ? '#fff' : '#fff'}
             transparent
             opacity={isHovered ? +opacity * 3 : +opacity}
           />
         )}
-        {!isSolid && (
-          <Text
-            ref={textRef}
-            position={[0, 0, 0]}
-            fontSize={0.2}
-            material={new MeshBasicMaterial({ fog: false })}
-            fillOpacity={isHovered ? 1 : +opacity}
-            color="#ffffff"
-            anchorX="center"
-            anchorY="middle"
-          >
-            {props.cube.number}
-          </Text>
-        )}
+        <Text
+          ref={textRef}
+          position={[0, 0, 0]}
+          fontSize={0.2}
+          material={new MeshBasicMaterial({ fog: false })}
+          fillOpacity={
+            !props.isRevealed && !props.isFlagged ? 0 : isHovered ? 1 : +opacity
+          }
+          color="#ffffff"
+          anchorX="center"
+          anchorY="middle"
+        >
+          {props.isFlagged ? 'F' : props.isRevealed ? props.cube.number : ''}
+        </Text>
       </mesh>
     )
   },
