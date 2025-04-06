@@ -44,15 +44,8 @@ export const DefaultScene = (props: { onGameOver: () => void }) => {
   const groupRef = useRef<Group>(null)
 
   useEffect(() => {
-    const handleFocus = () => {
-      controls.current?.lock()
-    }
-    document.addEventListener('click', handleFocus)
-
-    return () => {
-      document.removeEventListener('click', handleFocus)
-    }
-  }, [gl])
+    controls.current?.lock()
+  }, [])
 
   useMouseInput(() => {
     setBoxes((b) =>
