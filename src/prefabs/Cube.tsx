@@ -3,6 +3,7 @@ import { Outlines, Text } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { memo, useRef, useState } from 'react'
 import { Mesh, Vector3 } from 'three'
+import { FOG_DISTANCE } from '../scene/DefaultScene'
 
 export type Cube = {
   position: Triplet
@@ -46,7 +47,11 @@ export const Cube = memo(
       if (cubeRef.current) {
         const cubePosition = new Vector3(...position)
         const distance = cubePosition.distanceTo(camera.position)
-        setOpacity(Math.min(1, Math.max(0, 1 - distance / 7)).toFixed(2))
+        setOpacity(
+          Math.min(1, Math.max(0, 1 - (distance / FOG_DISTANCE) * 1.2)).toFixed(
+            2,
+          ),
+        )
       }
     })
 
@@ -54,7 +59,7 @@ export const Cube = memo(
       <mesh ref={cubeRef} uuid={uuid} castShadow>
         <boxGeometry args={[0.5, 0.5, 0.5]} />
         <meshLambertMaterial
-          opacity={isSolid ? +opacity : 0}
+          opacity={isSolid ? 1 : 0}
           transparent
           depthTest
           color={isMine ? '#ff0000' : '#0077ff'}
@@ -64,7 +69,7 @@ export const Cube = memo(
             thickness={isHovered ? 5 : isSolid ? 0 : 2}
             color={'#fff'}
             transparent
-            opacity={isHovered ? +opacity * 4 : +opacity}
+            opacity={isHovered ? +opacity * 3 : +opacity}
           />
         )}
         {!isSolid && (
@@ -72,7 +77,7 @@ export const Cube = memo(
             ref={textRef}
             position={[0, 0, 0]}
             fontSize={0.2}
-            fillOpacity={+opacity}
+            fillOpacity={+opacity * 4}
             color="#ffffff"
             anchorX="center"
             anchorY="middle"

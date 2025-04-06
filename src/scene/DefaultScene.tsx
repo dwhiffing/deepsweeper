@@ -8,9 +8,11 @@ import { Cube } from '../prefabs/Cube'
 import { Group, Raycaster, Vector2 } from 'three'
 import { v4 as uuidv4 } from 'uuid'
 import { useMouseInput } from '../hooks/useMouseInput'
+import { DEBUG } from '../App'
 
 extend({ PointerLockControls })
 
+export const FOG_DISTANCE = 10
 const gridSize = 5
 const sp = 2
 const getBoxes = () => {
@@ -44,7 +46,12 @@ export const DefaultScene = (props: { onGameOver: () => void }) => {
   const groupRef = useRef<Group>(null)
 
   useEffect(() => {
-    controls.current?.lock()
+    const handleFocus = () => controls.current?.lock()
+    if (!DEBUG) controls.current?.lock()
+    document.addEventListener('click', handleFocus)
+    return () => {
+      document.removeEventListener('click', handleFocus)
+    }
   }, [])
 
   useMouseInput(() => {
@@ -75,6 +82,7 @@ export const DefaultScene = (props: { onGameOver: () => void }) => {
   return (
     <>
       {/* <Skybox /> */}
+      <fog attach="fog" args={['#001', 1, FOG_DISTANCE]} />
       {/* @ts-expect-error pointer lock */}
       <pointerLockControls ref={controls} args={[camera, gl.domElement]} />
       <directionalLight
@@ -92,6 +100,7 @@ export const DefaultScene = (props: { onGameOver: () => void }) => {
       >
         <Player />
         <Plane />
+        {/* <PulsingLight /> */}
         <group ref={groupRef}>
           {boxes.map((cube, i) => (
             <Cube
