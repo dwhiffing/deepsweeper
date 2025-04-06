@@ -4,6 +4,7 @@ import { useFrame } from '@react-three/fiber'
 import { memo, useRef, useState } from 'react'
 import { Mesh, MeshBasicMaterial, Vector3 } from 'three'
 import { FOG_DISTANCE } from '../utils/constants'
+import { PulsingLight } from './PulsingLight'
 
 export type Cube = {
   position: Triplet
@@ -31,9 +32,10 @@ export const Cube = memo(
     const isHovered = props.isHovered
 
     const isEmpty = props.isRevealed && props.cube.number === 0 && !isMine
+    const size = isEmpty ? 0.175 : 0.5
     const [cubeRef] = useBox(() => ({
       mass: 1,
-      args: [0.5, 0.5, 0.5],
+      args: [size, size, size],
       material: { friction: 1, restitution: 0 },
       position,
       type: 'Static',
@@ -63,7 +65,6 @@ export const Cube = memo(
       }
     })
 
-    const size = isEmpty ? 0.175 : 0.5
     const outlineOpacity =
       isHovered || props.isSelected
         ? 1
@@ -71,11 +72,10 @@ export const Cube = memo(
         ? +opacity / 2
         : +opacity
 
-    const text = props.isFlagged
-      ? 'F'
-      : props.isRevealed && props.cube.number !== 0
-      ? props.cube.number
-      : ''
+    const text =
+      !props.isFlagged && props.isRevealed && props.cube.number !== 0
+        ? props.cube.number
+        : ''
 
     return (
       <mesh ref={cubeRef} uuid={uuid} castShadow>
@@ -99,15 +99,14 @@ export const Cube = memo(
           position={[0, 0, 0]}
           fontSize={0.2}
           material={new MeshBasicMaterial({ fog: false })}
-          fillOpacity={
-            !props.isRevealed && !props.isFlagged ? 0 : isHovered ? 1 : +opacity
-          }
+          fillOpacity={!props.isRevealed && isHovered ? 1 : +opacity}
           color="#ffffff"
           anchorX="center"
           anchorY="middle"
         >
           {text}
         </Text>
+        {props.isFlagged && <PulsingLight />}
       </mesh>
     )
   },

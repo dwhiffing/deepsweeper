@@ -1,4 +1,4 @@
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import { useState } from 'react'
 import { useMemo } from 'react'
 import { shaderMaterial } from '@react-three/drei'
@@ -109,16 +109,16 @@ export const FakeGlowMaterial = ({
 }
 
 export const PulsingLight = () => {
-  const [falloff, setFalloff] = useState(0)
-
-  const size = 0.5
-  // const [size, setSize] = useState(0.1)
+  const { clock } = useThree()
+  const t = clock.getElapsedTime()
+  const [falloff, setFalloff] = useState((2 + Math.sin(t * 8)) * 3)
+  const size = 0.1
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime()
-    const pulse = Math.sin(t)
-    setFalloff((3 + pulse) * 2)
-    // setSize(0.1 + (1 - pulse) / 8)
+
+    const f = (2 + Math.sin(t * 8)) * 3
+    setFalloff(f)
   })
 
   return (

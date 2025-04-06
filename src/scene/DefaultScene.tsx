@@ -72,7 +72,9 @@ export const DefaultScene = (props: {
     if (revealed.has(uuid) && cube && cube.number === 0) {
       const neighbors = getAdjacent(cube, ref.current.cubeMap)
       setRevealed((r) => {
-        neighbors.forEach((n) => r.add(n.uuid))
+        neighbors.forEach((n) => {
+          if (!flagged.has(n.uuid)) r.add(n.uuid)
+        })
         return new Set(r)
       })
     } else {
