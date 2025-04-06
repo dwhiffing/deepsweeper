@@ -12,7 +12,7 @@ import { DEBUG } from '../App'
 
 extend({ PointerLockControls })
 
-export const FOG_DISTANCE = 10
+export const FOG_DISTANCE = 6
 const gridSize = 5
 const sp = 2
 const getBoxes = () => {
