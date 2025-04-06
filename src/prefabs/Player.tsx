@@ -10,15 +10,16 @@ import { jumpSound } from '../utils/audio'
 const speed = 20
 const jumpSpeed = 2
 
-export const Player = () => {
+export const Player = (props: { gridSize: number }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_sphereRef, api] = useSphere(() => ({
     mass: 100,
     fixedRotation: true,
-    position: [4, 0, 4],
+    position: [p, 0, p],
     args: [0.2],
     material: { friction: 0 },
   }))
+  const p = props.gridSize * 1 + 2
 
   const pressed = useKeyboardInput(['w', 'a', 's', 'd', ' '])
   const input = useVariable(pressed)

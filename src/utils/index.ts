@@ -1,13 +1,10 @@
 import { Triplet } from '@react-three/cannon'
 import { v4 as uuidv4 } from 'uuid'
 import { Cube } from '../prefabs/Cube'
-import { gridSize, mineCount, mineSpacing } from './constants'
 
 const directions = [-1, 0, 1]
 
-const sp = mineSpacing
-
-export const getBoxes = () => {
+export const getBoxes = (gridSize: number, mineCount: number, sp: number) => {
   const boxes = []
   const cubeMap: Record<string, Cube> = {}
 
@@ -34,12 +31,16 @@ export const getBoxes = () => {
     }
   }
 
-  assignMines(cubeMap)
+  assignMines(gridSize, mineCount, cubeMap)
 
   return { boxes: boxes as Cube[], cubeMap }
 }
 
-const assignMines = (cubeMap: Record<string, Cube>) => {
+const assignMines = (
+  gridSize: number,
+  mineCount: number,
+  cubeMap: Record<string, Cube>,
+) => {
   // Step 2: Randomly select 'mineCount' cells to be mines
   const availablePositions = [...Array(gridSize * gridSize * gridSize).keys()]
   for (let i = 0; i < mineCount; i++) {

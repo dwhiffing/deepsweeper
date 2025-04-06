@@ -4,7 +4,7 @@ import { UI } from './components/UI'
 import { DefaultScene } from './scene/DefaultScene'
 import './index.css'
 import { useEffect, useState } from 'react'
-import { DEBUG, DUR } from './utils/constants'
+import { DEBUG, DUR, mineSpacing } from './utils/constants'
 import { clickSound } from './utils/audio'
 
 export default function App() {
@@ -12,9 +12,20 @@ export default function App() {
   const [gameFade, setGameFade] = useState(false)
   const [gameState, setGameState] = useState('')
   const [menuFade, setMenuFade] = useState(false)
+  const [gridSize, setGridSize] = useState(3)
+  const [mineCount, setMineCount] = useState(3)
+  const [showButtons, setShowButtons] = useState(false)
   useEffect(() => {
     setTimeout(() => setGameFade(gameStarted), DUR)
   }, [gameStarted])
+
+  const onStart = (size: number, mines: number) => {
+    setMineCount(mines)
+    setGridSize(size)
+    setMenuFade(true)
+    clickSound.play()
+    setTimeout(() => setGameStarted(true), DUR)
+  }
 
   return gameStarted ? (
     <>
@@ -30,6 +41,9 @@ export default function App() {
       </UI>
       <Canvas style={{ backgroundColor: '#001' }}>
         <DefaultScene
+          gridSize={gridSize}
+          spacing={mineSpacing}
+          mineCount={mineCount}
           onGameOver={(state: string) => {
             setGameFade(false)
             setGameState(state)
@@ -52,26 +66,27 @@ export default function App() {
           pointerEvents: menuFade ? 'auto' : 'none',
         }}
       />
-      <div className="flex flex-col items-center gap-4">
-        <h3 className="text-3xl font-bold">Deepsweeper</h3>
-        <p>
-          {gameState === 'lose'
-            ? 'You lose!'
-            : gameState === 'win'
-            ? 'You win!'
-            : "Sweep the mines and don't die"}
-        </p>
-        <button
-          className="bg-white text-black border rounded-md px-4 py-2 cursor-pointer"
-          onClick={() => {
-            setMenuFade(true)
-            clickSound.play()
-            setTimeout(() => setGameStarted(true), DUR)
-          }}
-        >
-          Start Game
-        </button>
-      </div>
+      {showButtons ? (
+        <div className="flex flex-col items-center gap-4">
+          <button onClick={() => onStart(3, 1)}>Easy</button>
+          <button onClick={() => onStart(5, 5)}>Medium</button>
+          <button onClick={() => onStart(7, 10)}>Hard</button>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center gap-4">
+          <h3 className="text-3xl font-bold">Deepsweeper</h3>
+          <p>
+            {gameState === 'lose'
+              ? 'You lose!'
+              : gameState === 'win'
+              ? 'You win!'
+              : "Sweep the mines and don't die"}
+          </p>
+          <div>
+            <button onClick={() => setShowButtons(true)}>Start Game</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

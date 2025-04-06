@@ -21,10 +21,13 @@ extend({ PointerLockControls })
 
 export const DefaultScene = (props: {
   onGameOver: (state: string) => void
+  gridSize: number
+  mineCount: number
+  spacing: number
 }) => {
   const { camera, gl } = useThree()
   const controls = useRef<PointerLockControls>(null)
-  const ref = useRef(getBoxes())
+  const ref = useRef(getBoxes(props.gridSize, props.mineCount, props.spacing))
   const boxes = ref.current.boxes
   const [revealed, setRevealed] = useState<Set<string>>(new Set())
   const [flagged, setFlagged] = useState<Set<string>>(new Set())
@@ -166,7 +169,7 @@ export const DefaultScene = (props: {
         iterations={50}
         broadphase={'SAP'}
       >
-        <Player />
+        <Player gridSize={props.gridSize} />
         <Plane />
         {/* <PulsingLight /> */}
         <group ref={groupRef}>
