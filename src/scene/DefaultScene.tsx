@@ -9,6 +9,13 @@ import { Group, Raycaster, Vector2 } from 'three'
 import { useMouseInput } from '../hooks/useMouseInput'
 import { getAdjacent, getBoxes } from '../utils'
 import { DEBUG, FOG_DISTANCE } from '../utils/constants'
+import {
+  clickSound,
+  clickSound2,
+  explosionSound,
+  flagSound,
+  playSound,
+} from '../utils/audio'
 
 extend({ PointerLockControls })
 
@@ -37,6 +44,11 @@ export const DefaultScene = (props: {
     const uuid = activeBoxes[0]
     const cube = boxes.find((b) => b.uuid == uuid)
 
+    if (!uuid) {
+      playSound(clickSound2, 0.7, 1.2)
+      return
+    }
+
     // if right click, flag cube
     if (button === 2) {
       // if cube is already revealed, we cant flag it
@@ -45,8 +57,10 @@ export const DefaultScene = (props: {
       setFlagged((f) => {
         // toggle flag
         if (f.has(uuid)) {
+          clickSound2.play()
           f.delete(uuid)
         } else {
+          flagSound.play()
           f.add(uuid)
         }
 
@@ -61,15 +75,24 @@ export const DefaultScene = (props: {
     }
 
     // if you reveal a mine, you lose
-    setTimeout(() => {
-      if (cube?.isMine) props.onGameOver('lose')
-    }, 500)
+    if (cube?.isMine) {
+      explosionSound.play()
+      setTimeout(() => {
+        props.onGameOver('lose')
+      }, 500)
+      setRevealed((r) => {
+        r.add(uuid)
+        return new Set(r)
+      })
+      return
+    }
 
     // if you try to reveal a flagged cube, bail
     if (flagged.has(uuid)) return
 
     // if you reveal a revealed cube that is marked 0, reveal all adjacent
     if (revealed.has(uuid) && cube && cube.number === 0) {
+      playSound(clickSound, 0.7, 1.2)
       const neighbors = getAdjacent(cube, ref.current.cubeMap)
       setRevealed((r) => {
         neighbors.forEach((n) => {
@@ -77,12 +100,15 @@ export const DefaultScene = (props: {
         })
         return new Set(r)
       })
-    } else {
+    } else if (!revealed.has(uuid)) {
+      playSound(clickSound, 0.7, 1.2)
       // else just reveal that cube
       setRevealed((r) => {
         r.add(uuid)
         return new Set(r)
       })
+    } else {
+      playSound(clickSound2, 0.7, 1.2)
     }
   })
 
@@ -107,7 +133,10 @@ export const DefaultScene = (props: {
   const onGameOver = props.onGameOver
   const onCollide = useCallback(
     (cube: Cube) => {
-      if (cube.isMine) onGameOver('lose')
+      if (cube.isMine) {
+        explosionSound.play()
+        onGameOver('lose')
+      }
     },
     [onGameOver],
   )

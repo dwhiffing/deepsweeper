@@ -5,6 +5,7 @@ import { DefaultScene } from './scene/DefaultScene'
 import './index.css'
 import { useEffect, useState } from 'react'
 import { DEBUG, DUR } from './utils/constants'
+import { clickSound } from './utils/audio'
 
 export default function App() {
   const [gameStarted, setGameStarted] = useState(DEBUG)
@@ -64,6 +65,7 @@ export default function App() {
           className="bg-white text-black border rounded-md px-4 py-2 cursor-pointer"
           onClick={() => {
             setMenuFade(true)
+            clickSound.play()
             setTimeout(() => setGameStarted(true), DUR)
           }}
         >
