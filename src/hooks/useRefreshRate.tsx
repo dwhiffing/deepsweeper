@@ -10,8 +10,7 @@ export const useRefreshRate = () => {
     const delta = currentTime - lastTimeRef.current
     lastTimeRef.current = currentTime
 
-    const fps = 1 / delta
-    refreshRateRef.current = refreshRateRef.current * 0.9 + fps * 0.1
+    refreshRateRef.current = 1 / delta
   })
 
   return refreshRateRef.current

@@ -5,13 +5,16 @@ import { Vector3 } from 'three'
 import { useKeyboardInput } from '../hooks/useKeyboardInput'
 import { useVariable } from '../hooks/useVariable'
 import { jumpSound, playSound } from '../utils/audio'
+import { useRefreshRate } from '../hooks/useRefreshRate'
 
 /** Player movement constants */
-const speed = 18
+const _speed = 12
 const jumpSpeed = 0.65
 
 export const Player = (props: { gridSize: number }) => {
   const p = props.gridSize * 1 + 2
+  const refreshRate = useRefreshRate()
+  const speed = _speed * (refreshRate / 60)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_ref, api] = useSphere(() => ({
     mass: 100,
