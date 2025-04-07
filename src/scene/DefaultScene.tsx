@@ -7,7 +7,7 @@ import { Player } from '../prefabs/Player'
 import { Cube } from '../prefabs/Cube'
 import { Group, Raycaster, Vector2 } from 'three'
 import { useMouseInput } from '../hooks/useMouseInput'
-import { chunk, getAdjacent, getBoxes } from '../utils'
+import { chunk, getAdjacent, getBoxes, mineStatsStore } from '../utils'
 import { DEBUG, FOG_DISTANCE } from '../utils/constants'
 import {
   clickSound,
@@ -34,6 +34,19 @@ export const DefaultScene = (props: {
   const [activeBoxes, setActiveBoxes] = useState<string[]>([])
   const [hasWon, setHasWon] = useState(false)
   const groupRef = useRef<Group>(null)
+
+  useEffect(() => {
+    mineStatsStore.setState({ mines: props.mineCount - flagged.size })
+  }, [flagged, props.mineCount])
+
+  useEffect(() => {
+    mineStatsStore.setState({
+      cells:
+        props.gridSize * props.gridSize * props.gridSize -
+        revealed.size -
+        flagged.size,
+    })
+  }, [revealed, props.gridSize, flagged])
 
   // pointer lock
   useEffect(() => {

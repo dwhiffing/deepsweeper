@@ -9,6 +9,7 @@ import { clickSound, playSound } from './utils/audio'
 import { stopWatch } from './hooks/useStopwatch'
 import { formatTime } from './utils'
 import { StopWatch } from './components/StopWatch'
+import { MineStats } from './components/MineStats'
 
 export default function App() {
   const [gameStarted, setGameStarted] = useState(DEBUG)
@@ -17,7 +18,7 @@ export default function App() {
   const [menuFade, setMenuFade] = useState(false)
   const [gridSize, setGridSize] = useState(3)
   const [lastTime, setLastTime] = useState(0)
-  const [mineCount, setMineCount] = useState(3)
+  const [mineCount, setMineCount] = useState(1)
   const [showButtons, setShowButtons] = useState(false)
   useEffect(() => {
     setTimeout(() => setGameFade(gameStarted), DUR)
@@ -40,6 +41,7 @@ export default function App() {
   return gameStarted ? (
     <>
       <UI>
+        <MineStats />
         <StopWatch gameStarted={gameStarted} />
         <div
           className="transition-all inset-0 fixed z-20"

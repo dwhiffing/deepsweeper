@@ -1,6 +1,7 @@
 import { Triplet } from '@react-three/cannon'
 import { v4 as uuidv4 } from 'uuid'
 import { Cube } from '../prefabs/Cube'
+import { createStore } from 'zustand'
 
 const directions = [-1, 0, 1]
 
@@ -131,3 +132,8 @@ export function chunk<T>(arr: T[], size: number): T[][] {
 
   return result
 }
+
+export const mineStatsStore = createStore<{
+  mines: number
+  cells: number
+}>(() => ({ mines: 0, cells: 0 }))
