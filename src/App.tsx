@@ -83,8 +83,8 @@ export default function App() {
       {showButtons ? (
         <div className="flex flex-col items-center gap-4">
           <button onClick={() => onStart(3, 1)}>Easy</button>
-          <button onClick={() => onStart(5, 5)}>Medium</button>
-          <button onClick={() => onStart(7, 10)}>Hard</button>
+          <button onClick={() => onStart(5, 10)}>Medium</button>
+          <button onClick={() => onStart(6, 17)}>Hard</button>
         </div>
       ) : (
         <div className="flex flex-col items-center gap-4">
