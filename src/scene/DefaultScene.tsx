@@ -240,7 +240,7 @@ export const DefaultScene = (props: {
       />
       <ambientLight color="#404040" intensity={2.5} />
       <Physics
-        gravity={[0, -1.5, 0]}
+        gravity={[0, -1.7, 0]}
         tolerance={0}
         iterations={50}
         broadphase={'SAP'}

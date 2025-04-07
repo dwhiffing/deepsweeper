@@ -1,4 +1,4 @@
-import { useBox } from '@react-three/cannon'
+import { useSphere } from '@react-three/cannon'
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Vector3 } from 'three'
@@ -7,17 +7,17 @@ import { useVariable } from '../hooks/useVariable'
 import { jumpSound, playSound } from '../utils/audio'
 
 /** Player movement constants */
-const speed = 20
-const jumpSpeed = 1.5
+const speed = 18
+const jumpSpeed = 0.65
 
 export const Player = (props: { gridSize: number }) => {
   const p = props.gridSize * 1 + 2
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_ref, api] = useBox(() => ({
+  const [_ref, api] = useSphere(() => ({
     mass: 100,
     fixedRotation: true,
     position: [p, 0, p],
-    args: [0.2, 0.2, 0.2],
+    args: [0.02],
     material: { friction: 0, restitution: 0 },
   }))
 
@@ -81,20 +81,19 @@ export const Player = (props: { gridSize: number }) => {
     }
 
     api.velocity.set(
-      Math.min(speed, (state.current.vel[0] + velocity.x * delta) * 0.94),
-      state.current.vel[1],
-      Math.min(speed, (state.current.vel[2] + velocity.z * delta) * 0.94),
+      Math.min(speed, (state.current.vel[0] + velocity.x * delta) * 0.9),
+      space ? jumpSpeed : state.current.vel[1],
+      Math.min(speed, (state.current.vel[2] + velocity.z * delta) * 0.9),
     )
 
     camera.position.set(
       state.current.pos[0],
-      state.current.pos[1],
+      state.current.pos[1] + 0.05,
       state.current.pos[2],
     )
 
     if (space) {
       playSound(jumpSound, 0.6, 0.7, 0.2)
-      api.velocity.set(state.current.vel[0], jumpSpeed, state.current.vel[2])
     }
   })
 
