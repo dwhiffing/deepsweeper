@@ -114,7 +114,9 @@ export const DefaultScene = (props: {
             })
           }
           playSound(spearSound, 0.9, 1.1, 0.7)
-          mineStatsStore.setState({ spears: 0 })
+          mineStatsStore.setState({
+            spears: mineStatsStore.getState().spears - 1,
+          })
         }
       }
     }
