@@ -116,19 +116,37 @@ export const DefaultScene = (props: {
     }
   })
 
-  // on frame
+  const lastUuid = useRef('')
+  const stillFrames = useRef(0)
+
   useFrame(({ camera }) => {
     if (!groupRef.current) return
+
     const raycaster = new Raycaster()
-    raycaster.setFromCamera(new Vector2(0, 0), camera) // center of screen
+    raycaster.setFromCamera(new Vector2(0, 0), camera)
     const intersects = raycaster.intersectObjects(groupRef.current.children)
-    // highlights all cubes adjacent to the hovered cube
     const uuid = intersects[0]?.object.uuid ?? ''
-    const cube = boxes.find((b) => b.uuid == uuid)
-    const adjacent = cube ? getAdjacent(cube, ref.current.cubeMap) : []
-    const ids = [uuid, ...adjacent.map((c) => c.uuid)]
-    if (activeBoxes.join(':') !== ids.join(':')) {
-      setActiveBoxes(ids.filter(Boolean))
+
+    // highlights all cubes adjacent to the hovered cube as long as we've hovered it for about 1 second
+    // otherwise just the hovered cube
+    if (uuid && uuid === lastUuid.current) {
+      stillFrames.current++
+    } else {
+      stillFrames.current = 0
+      lastUuid.current = uuid
+    }
+
+    const highlightUuids =
+      stillFrames.current >= 60
+        ? (() => {
+            const cube = boxes.find((b) => b.uuid === uuid)
+            const adjacent = cube ? getAdjacent(cube, ref.current.cubeMap) : []
+            return [uuid, ...adjacent.map((c) => c.uuid)]
+          })()
+        : [uuid]
+
+    if (activeBoxes.join(':') !== highlightUuids.join(':')) {
+      setActiveBoxes(highlightUuids.filter(Boolean))
     }
   })
 
