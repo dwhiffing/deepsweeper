@@ -21,6 +21,7 @@ import {
   explosionSound,
   flagSound,
   playSound,
+  spearSound,
   winSound,
 } from '../utils/audio'
 import { useRefreshRate } from '../hooks/useRefreshRate'
@@ -44,10 +45,17 @@ export const DefaultScene = (props: {
   const groupRef = useRef<Group>(null)
   const refreshRate = useRefreshRate()
 
+  // reset stats: spears
+  useEffect(() => {
+    mineStatsStore.setState({ spears: 1 })
+  }, [])
+
+  // reset stats: mine count
   useEffect(() => {
     mineStatsStore.setState({ mines: props.mineCount - flagged.size })
   }, [flagged, props.mineCount])
 
+  // reset stats: cell count
   useEffect(() => {
     mineStatsStore.setState({
       cells:
@@ -66,6 +74,49 @@ export const DefaultScene = (props: {
       document.removeEventListener('click', handleFocus)
     }
   }, [])
+
+  // on use spear
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === 'q') {
+        if (mineStatsStore.getState().spears === 0) return
+
+        if (revealed.size === 0) {
+          assignMines(
+            props.gridSize,
+            props.mineCount,
+            ref.current.cubeMap,
+            activeBoxes[0],
+          )
+        }
+
+        const uuid = activeBoxes[0]
+        const cube = boxes.find((b) => b.uuid == uuid)
+
+        if (uuid && cube && !flagged.has(uuid) && !revealed.has(uuid)) {
+          if (cube.isMine) {
+            setFlagged((f) => {
+              f.add(uuid)
+              return new Set(f)
+            })
+          } else {
+            setRevealed((r) => {
+              r.add(uuid)
+              return new Set(r)
+            })
+          }
+          playSound(spearSound, 0.9, 1.1, 0.7)
+          mineStatsStore.setState({ spears: 0 })
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [flagged, revealed, activeBoxes, boxes, props.mineCount, props.gridSize])
 
   // on click
   useMouseInput((button: number) => {

@@ -139,4 +139,5 @@ export function chunk<T>(arr: T[], size: number): T[][] {
 export const mineStatsStore = createStore<{
   mines: number
   cells: number
-}>(() => ({ mines: 0, cells: 0 }))
+  spears: number
+}>(() => ({ mines: 0, cells: 0, spears: 0 }))

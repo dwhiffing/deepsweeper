@@ -4,6 +4,7 @@ export const explosionSound = new Audio('audio/explosion.mp3')
 export const flagSound = new Audio('audio/flag.mp3')
 export const jumpSound = new Audio('audio/swim.mp3')
 export const winSound = new Audio('audio/win.mp3')
+export const spearSound = new Audio('audio/spear.mp3')
 export const music = new Audio('audio/music.mp3')
 export let muted = false
 export const toggleMute = () => {
