@@ -109,6 +109,9 @@ export const DefaultScene = (props: {
       return
     }
 
+    // if you try to reveal a flagged cube, bail
+    if (flagged.has(uuid)) return
+
     // if you reveal a mine, you lose
     if (cube?.isMine) {
       playSound(explosionSound)
@@ -121,9 +124,6 @@ export const DefaultScene = (props: {
       })
       return
     }
-
-    // if you try to reveal a flagged cube, bail
-    if (flagged.has(uuid)) return
 
     // if you reveal a revealed cube that is marked 0, reveal all adjacent
     if (cube && !revealed.has(uuid)) {
