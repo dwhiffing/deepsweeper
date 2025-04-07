@@ -23,6 +23,7 @@ import {
   playSound,
   winSound,
 } from '../utils/audio'
+import { useRefreshRate } from '../hooks/useRefreshRate'
 
 extend({ PointerLockControls })
 
@@ -41,6 +42,7 @@ export const DefaultScene = (props: {
   const [activeBoxes, setActiveBoxes] = useState<string[]>([])
   const [hasWon, setHasWon] = useState(false)
   const groupRef = useRef<Group>(null)
+  const refreshRate = useRefreshRate()
 
   useEffect(() => {
     mineStatsStore.setState({ mines: props.mineCount - flagged.size })
@@ -173,7 +175,7 @@ export const DefaultScene = (props: {
     }
 
     const highlightUuids =
-      stillFrames.current >= 60
+      stillFrames.current >= refreshRate / 3
         ? (() => {
             const cube = boxes.find((b) => b.uuid === uuid)
             const adjacent = cube ? getAdjacent(cube, ref.current.cubeMap) : []
