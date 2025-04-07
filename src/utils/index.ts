@@ -5,7 +5,7 @@ import { createStore } from 'zustand'
 
 const directions = [-1, 0, 1]
 
-export const getBoxes = (gridSize: number, mineCount: number, sp: number) => {
+export const getBoxes = (gridSize: number, sp: number) => {
   const boxes = []
   const cubeMap: Record<string, Cube> = {}
 
@@ -32,19 +32,19 @@ export const getBoxes = (gridSize: number, mineCount: number, sp: number) => {
     }
   }
 
-  assignMines(gridSize, mineCount, cubeMap)
-
   return { boxes: boxes as Cube[], cubeMap }
 }
 
-const assignMines = (
+export const assignMines = (
   gridSize: number,
   mineCount: number,
   cubeMap: Record<string, Cube>,
+  blacklistId: string,
 ) => {
   // Step 2: Randomly select 'mineCount' cells to be mines
   const availablePositions = [...Array(gridSize * gridSize * gridSize).keys()]
-  for (let i = 0; i < mineCount; i++) {
+  let i = 0
+  while (i < mineCount) {
     // Randomly select an index from available positions
     const randomIndex = Math.floor(Math.random() * availablePositions.length)
     const selectedIndex = availablePositions[randomIndex]
@@ -57,7 +57,10 @@ const assignMines = (
 
     // Mark the cube as a mine
     const cube = cubeMap[`${x},${y},${z}`]
-    cube.isMine = true
+    if (cube.uuid !== blacklistId) {
+      i++
+      cube.isMine = true
+    }
   }
 
   // count adjacent mines

@@ -7,7 +7,13 @@ import { Player } from '../prefabs/Player'
 import { Cube } from '../prefabs/Cube'
 import { Group, Raycaster, Vector2 } from 'three'
 import { useMouseInput } from '../hooks/useMouseInput'
-import { chunk, getAdjacent, getBoxes, mineStatsStore } from '../utils'
+import {
+  assignMines,
+  chunk,
+  getAdjacent,
+  getBoxes,
+  mineStatsStore,
+} from '../utils'
 import { DEBUG, FOG_DISTANCE } from '../utils/constants'
 import {
   clickSound,
@@ -28,7 +34,7 @@ export const DefaultScene = (props: {
 }) => {
   const { camera, gl } = useThree()
   const controls = useRef<PointerLockControls>(null)
-  const ref = useRef(getBoxes(props.gridSize, props.mineCount, props.spacing))
+  const ref = useRef(getBoxes(props.gridSize, props.spacing))
   const boxes = ref.current.boxes
   const [revealed, setRevealed] = useState<Set<string>>(new Set())
   const [flagged, setFlagged] = useState<Set<string>>(new Set())
@@ -64,9 +70,18 @@ export const DefaultScene = (props: {
     const uuid = activeBoxes[0]
     const cube = boxes.find((b) => b.uuid == uuid)
 
-    if (!uuid) {
+    if (!uuid || !cube) {
       playSound(clickSound2, 0.9, 1.1, 0.4)
       return
+    }
+
+    if (revealed.size === 0) {
+      assignMines(
+        props.gridSize,
+        props.mineCount,
+        ref.current.cubeMap,
+        activeBoxes[0],
+      )
     }
 
     // if right click, flag cube
