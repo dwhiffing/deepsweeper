@@ -1,14 +1,8 @@
 import { useBox, Triplet } from '@react-three/cannon'
-import { Outlines, Text } from '@react-three/drei'
+import { Outlines } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { memo, useMemo, useRef, useState } from 'react'
-import {
-  BoxGeometry,
-  EdgesGeometry,
-  Mesh,
-  MeshBasicMaterial,
-  ShaderMaterial,
-} from 'three'
+import { CanvasTexture, Mesh, MeshBasicMaterial } from 'three'
 import { useSpring } from '@react-spring/three'
 import { PulsingLight } from './PulsingLight'
 
@@ -35,7 +29,6 @@ export const Cube = memo(
   }) => {
     const { position, isMine, uuid } = props.cube
     const [isColliding, setIsColliding] = useState(false)
-    const [opacity, setOpacity] = useState<string>('1')
     const isHovered = props.isHovered
 
     const isEmpty = props.isRevealed && props.cube.number === 0 && !isMine
@@ -46,7 +39,6 @@ export const Cube = memo(
       material: { friction: 1, restitution: 0 },
       position,
       type: 'Static',
-      // isTrigger: !props.isRevealed || props.cube.number !== 0,
       isTrigger: false,
       onCollide: () => {
         setIsColliding(true)
@@ -63,55 +55,33 @@ export const Cube = memo(
       if (textRef.current) {
         textRef.current.lookAt(camera.position)
       }
-      // if (cubeRef.current) {
-      //   const cubePosition = new Vector3(...position)
-      //   const distance = cubePosition.distanceTo(camera.position)
-      //   setOpacity(clamp(1 - (distance / FOG_DISTANCE) * 0.8, 0, 1).toFixed(2))
-      // }
     })
 
-    const outlineOpacity =
-      isHovered || props.isSelected
-        ? +opacity * 20
-        : props.isDimmed || isEmpty
-        ? clamp(+opacity, 0.05, 0.08)
-        : props.isRevealed
-        ? clamp(+opacity, 0, 0.6)
-        : clamp(+opacity, 0, 0.2)
+    const outlineOpacity = isHovered || props.isSelected ? 1 : 0.3
+    const materials = useMemo(() => {
+      const map = createTextTexture(
+        `${props.cube.number}`,
+        !!props.isRevealed,
+        !!props.isFlagged,
+        isMine,
+      )
 
-    const text =
-      !props.isFlagged && props.isRevealed && props.cube.number !== 0
-        ? props.cube.number
-        : ''
+      return new Array(6).fill('').map(() => new MeshBasicMaterial({ map }))
+    }, [props.cube.number, props.isFlagged, props.isRevealed, isMine])
 
     return (
       <mesh ref={cubeRef} uuid={uuid} castShadow>
         <boxGeometry args={[size, size, size]} />
-        <meshLambertMaterial
-          opacity={(isMine && props.isRevealed) || isEmpty ? 1 : 0}
-          transparent
-          depthTest
-          color={isMine ? '#ff0000' : '#3aa'}
-        />
+
+        {/* @ts-expect-error materials */}
+        <meshBasicMaterial attach="material" args={materials} fog={true} />
         {!isColliding && (
           <AnimatedOutlines
-            thickness={props.isSelected ? 6 : 2}
+            thickness={props.isSelected || props.isHovered ? 6 : 2}
             color={props.isSelected ? '#ff0' : '#fff'}
             opacity={outlineOpacity}
           />
         )}
-        <Text
-          ref={textRef}
-          position={[0, 0, 0]}
-          fontSize={0.2}
-          material={new MeshBasicMaterial({ fog: false })}
-          fillOpacity={props.isRevealed && isHovered ? +opacity * 20 : +opacity}
-          color="#ffffff"
-          anchorX="center"
-          anchorY="middle"
-        >
-          {text}
-        </Text>
         {props.isFlagged && (
           <PulsingLight color={props.hasWon ? '#0a0' : '#a00'} />
         )}
@@ -148,3 +118,47 @@ function AnimatedOutlines(props: {
   )
 }
 
+function createTextTexture(
+  text: string,
+  isRevealed: boolean,
+  isFlagged: boolean,
+  isMine: boolean,
+) {
+  const size = 64
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')!
+
+  ctx.fillStyle = isFlagged
+    ? '#100'
+    : isRevealed
+    ? isMine
+      ? '#f00'
+      : COLORS[text as keyof typeof COLORS] ?? '#000'
+    : '#000011'
+  ctx.fillRect(0, 0, size, size)
+
+  if (text !== '0' && isRevealed) {
+    ctx.font = 'bold 28px sans-serif'
+    ctx.fillStyle = 'white'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(text, size / 2, size / 2)
+  }
+
+  const texture = new CanvasTexture(canvas)
+  texture.needsUpdate = true
+  return texture
+}
+
+// 26 is max possible
+const COLORS = {
+  '0': '#001100',
+  '1': '#000044',
+  '2': '#004400',
+  '3': '#444400',
+  '4': '#440044',
+  '5': '#440000',
+  '6': '#004444',
+}
