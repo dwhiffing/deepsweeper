@@ -69,12 +69,7 @@ export const DefaultScene = (props: {
         }
 
         // if all mines are flagged, you win
-        if (boxes.filter((b) => b.isMine).every((b) => f.has(b.uuid))) {
-          setHasWon(true)
-          setTimeout(() => {
-            props.onGameOver('win')
-          }, 1000)
-        }
+
         return new Set(f)
       })
 
@@ -136,6 +131,21 @@ export const DefaultScene = (props: {
       }
     }
   })
+
+  useEffect(() => {
+    if (
+      boxes.every((b) =>
+        b.isMine
+          ? flagged.has(b.uuid)
+          : revealed.has(b.uuid) && !flagged.has(b.uuid),
+      )
+    ) {
+      setHasWon(true)
+      setTimeout(() => {
+        props.onGameOver('win')
+      }, 1000)
+    }
+  }, [flagged, revealed, boxes, props])
 
   const onGameOver = props.onGameOver
   const onCollide = useCallback(
