@@ -28,7 +28,6 @@ export const Cube = memo(
     onCollide?: (cube: Cube) => void
   }) => {
     const { position, isMine, uuid } = props.cube
-    const [isColliding, setIsColliding] = useState(false)
     const isHovered = props.isHovered
 
     const isEmpty = props.isRevealed && props.cube.number === 0 && !isMine
@@ -41,11 +40,7 @@ export const Cube = memo(
       type: 'Static',
       isTrigger: false,
       onCollide: () => {
-        setIsColliding(true)
         props.onCollide?.(props.cube)
-      },
-      onCollideEnd: () => {
-        setIsColliding(false)
       },
     }))
 
@@ -57,7 +52,7 @@ export const Cube = memo(
       }
     })
 
-    const outlineOpacity = props.isSelected ? 1 : isHovered ? 1 : 0.2
+    const outlineOpacity = props.isSelected ? 1 : isHovered ? 1 : 0.4
     const materials = useMemo(() => {
       const map = createTextTexture(
         `${props.cube.number}`,
@@ -82,13 +77,19 @@ export const Cube = memo(
 
         {/* @ts-expect-error materials */}
         <meshBasicMaterial attach="material" args={materials} fog={true} />
-        {!isColliding && (
-          <AnimatedOutlines
-            thickness={props.isSelected || props.isHovered ? 8 : 2}
-            color={props.isHovered && !props.isSelected ? '#ff0' : '#fff'}
-            opacity={outlineOpacity}
-          />
-        )}
+        <AnimatedOutlines
+          thickness={
+            props.isSelected
+              ? 7
+              : props.isHovered
+              ? 5
+              : props.isRevealed
+              ? 0
+              : 2
+          }
+          color={props.isHovered && !props.isSelected ? '#ff0' : '#fff'}
+          opacity={outlineOpacity}
+        />
         {props.isFlagged && (
           <PulsingLight color={props.hasWon ? '#0a0' : '#a00'} />
         )}
