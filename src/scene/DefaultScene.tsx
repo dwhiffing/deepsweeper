@@ -55,8 +55,8 @@ export const DefaultScene = (props: {
 
   // reset stats: spears
   useEffect(() => {
-    mineStatsStore.setState({ spears: 1 })
-  }, [])
+    mineStatsStore.setState({ spears: spearCounts[props.gridSize] })
+  }, [props.gridSize])
 
   // reset stats: mine count
   useEffect(() => {
@@ -342,4 +342,11 @@ export const DefaultScene = (props: {
       </Physics>
     </>
   )
+}
+
+const spearCounts: Record<number, number> = {
+  3: 1,
+  4: 1,
+  5: 2,
+  7: 3,
 }
