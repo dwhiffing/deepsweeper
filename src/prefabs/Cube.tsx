@@ -124,7 +124,7 @@ function createTextTexture(
   isFlagged: boolean,
   isMine: boolean,
 ) {
-  const size = 64
+  const size = 512
   const canvas = document.createElement('canvas')
   canvas.width = size
   canvas.height = size
@@ -140,7 +140,7 @@ function createTextTexture(
   ctx.fillRect(0, 0, size, size)
 
   if (text !== '0' && isRevealed) {
-    ctx.font = 'bold 28px sans-serif'
+    ctx.font = 'bold 256px sans-serif'
     ctx.fillStyle = 'white'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
