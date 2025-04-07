@@ -58,7 +58,7 @@ export const Cube = memo(
       if (cubeRef.current) {
         const cubePosition = new Vector3(...position)
         const distance = cubePosition.distanceTo(camera.position)
-        setOpacity(clamp(1 - (distance / FOG_DISTANCE) * 1.2, 0, 1).toFixed(2))
+        setOpacity(clamp(1 - (distance / FOG_DISTANCE) * 0.8, 0, 1).toFixed(2))
       }
     })
 
@@ -67,7 +67,9 @@ export const Cube = memo(
         ? +opacity * 20
         : props.isDimmed || isEmpty
         ? clamp(+opacity, 0.05, 0.08)
-        : +opacity
+        : props.isRevealed
+        ? clamp(+opacity, 0, 0.6)
+        : clamp(+opacity, 0, 0.08)
 
     const text =
       !props.isFlagged && props.isRevealed && props.cube.number !== 0

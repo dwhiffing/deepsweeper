@@ -195,9 +195,10 @@ export const DefaultScene = (props: {
               isRevealed={revealed.has(cube.uuid)}
               isFlagged={flagged.has(cube.uuid)}
               isHovered={activeBoxes.includes(cube.uuid)}
-              isDimmed={
-                activeBoxes.length > 0 && !activeBoxes.includes(cube.uuid)
-              }
+              isDimmed={false}
+              // isDimmed={
+              //   activeBoxes.length > 0 && !activeBoxes.includes(cube.uuid)
+              // }
               isSelected={activeBoxes[0] === cube.uuid}
               onCollide={onCollide}
             />
