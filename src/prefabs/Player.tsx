@@ -24,7 +24,19 @@ export const Player = (props: { gridSize: number }) => {
     material: { friction: 0, restitution: 0 },
   }))
 
-  const pressed = useKeyboardInput(['w', 'a', 's', 'd', ' '])
+  const pressed = useKeyboardInput([
+    'w',
+    'a',
+    's',
+    'd',
+    'arrowup',
+    'arrowleft',
+    'arrowright',
+    'arrowdown',
+    'control',
+    'shift',
+    ' ',
+  ])
   const input = useVariable(pressed)
 
   const { camera } = useThree()
@@ -43,7 +55,18 @@ export const Player = (props: { gridSize: number }) => {
   }, [api, camera, p])
 
   useFrame((_, delta) => {
-    const { w, s, a, d } = input.current
+    const {
+      w,
+      s,
+      a,
+      d,
+      arrowdown,
+      arrowleft,
+      arrowright,
+      arrowup,
+      control,
+      shift,
+    } = input.current
     const space = input.current[' ']
 
     const velocity = new Vector3(0, 0, 0)
@@ -59,16 +82,18 @@ export const Player = (props: { gridSize: number }) => {
 
     let [horizontal, vertical] = [0, 0]
 
-    if (w) {
+    const isJumping = space || control || shift
+
+    if (w || arrowup) {
       vertical += 1
     }
-    if (s) {
+    if (s || arrowdown) {
       vertical -= 1
     }
-    if (d) {
+    if (d || arrowright) {
       horizontal += 1
     }
-    if (a) {
+    if (a || arrowleft) {
       horizontal -= 1
     }
 
@@ -85,7 +110,7 @@ export const Player = (props: { gridSize: number }) => {
 
     api.velocity.set(
       Math.min(speed, (state.current.vel[0] + velocity.x * delta) * 0.9),
-      space ? jumpSpeed : state.current.vel[1],
+      isJumping ? jumpSpeed : state.current.vel[1],
       Math.min(speed, (state.current.vel[2] + velocity.z * delta) * 0.9),
     )
 
@@ -95,7 +120,7 @@ export const Player = (props: { gridSize: number }) => {
       state.current.pos[2],
     )
 
-    if (space) {
+    if (isJumping) {
       playSound(jumpSound, 0.6, 0.7, 0.2)
     }
   })

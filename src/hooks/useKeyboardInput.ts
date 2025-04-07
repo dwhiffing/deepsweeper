@@ -23,6 +23,7 @@ export const useKeyboardInput = (keysToListen: string[] = []) => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const lowerKey = e.key.toLowerCase()
       if (getKeys().lowerCaseArray.includes(lowerKey)) {
+        e.preventDefault()
         setPressedKeys((keysPressed) => ({ ...keysPressed, [lowerKey]: true }))
       }
     }
