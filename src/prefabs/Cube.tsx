@@ -40,7 +40,7 @@ export const Cube = memo(
       material: { friction: 1, restitution: 0 },
       position,
       type: 'Static',
-      isTrigger: !isEmpty,
+      isTrigger: !props.isRevealed || props.cube.number !== 0,
       onCollide: () => {
         setIsColliding(true)
         props.onCollide?.(props.cube)
