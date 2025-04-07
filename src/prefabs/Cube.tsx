@@ -1,9 +1,15 @@
 import { useBox, Triplet } from '@react-three/cannon'
 import { Outlines, Text } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { memo, useRef, useState } from 'react'
-import { Mesh, MeshBasicMaterial, Vector3 } from 'three'
-import { FOG_DISTANCE } from '../utils/constants'
+import { memo, useMemo, useRef, useState } from 'react'
+import {
+  BoxGeometry,
+  EdgesGeometry,
+  Mesh,
+  MeshBasicMaterial,
+  ShaderMaterial,
+} from 'three'
+import { useSpring } from '@react-spring/three'
 import { PulsingLight } from './PulsingLight'
 
 export type Cube = {
@@ -29,7 +35,7 @@ export const Cube = memo(
   }) => {
     const { position, isMine, uuid } = props.cube
     const [isColliding, setIsColliding] = useState(false)
-    const [opacity, setOpacity] = useState<string>('0')
+    const [opacity, setOpacity] = useState<string>('1')
     const isHovered = props.isHovered
 
     const isEmpty = props.isRevealed && props.cube.number === 0 && !isMine
@@ -53,14 +59,15 @@ export const Cube = memo(
 
     const textRef = useRef<Mesh>(null)
     useFrame(({ camera }) => {
+      if (!props.isRevealed || props.cube.number === 0) return
       if (textRef.current) {
         textRef.current.lookAt(camera.position)
       }
-      if (cubeRef.current) {
-        const cubePosition = new Vector3(...position)
-        const distance = cubePosition.distanceTo(camera.position)
-        setOpacity(clamp(1 - (distance / FOG_DISTANCE) * 0.8, 0, 1).toFixed(2))
-      }
+      // if (cubeRef.current) {
+      //   const cubePosition = new Vector3(...position)
+      //   const distance = cubePosition.distanceTo(camera.position)
+      //   setOpacity(clamp(1 - (distance / FOG_DISTANCE) * 0.8, 0, 1).toFixed(2))
+      // }
     })
 
     const outlineOpacity =
@@ -70,7 +77,7 @@ export const Cube = memo(
         ? clamp(+opacity, 0.05, 0.08)
         : props.isRevealed
         ? clamp(+opacity, 0, 0.6)
-        : clamp(+opacity, 0, 0.08)
+        : clamp(+opacity, 0, 0.2)
 
     const text =
       !props.isFlagged && props.isRevealed && props.cube.number !== 0
@@ -87,10 +94,9 @@ export const Cube = memo(
           color={isMine ? '#ff0000' : '#3aa'}
         />
         {!isColliding && (
-          <Outlines
+          <AnimatedOutlines
             thickness={props.isSelected ? 6 : 2}
             color={props.isSelected ? '#ff0' : '#fff'}
-            transparent
             opacity={outlineOpacity}
           />
         )}
@@ -116,3 +122,29 @@ export const Cube = memo(
 
 const clamp = (number: number, min: number, max: number) =>
   Math.max(min, Math.min(number, max))
+
+function AnimatedOutlines(props: {
+  color: string
+  thickness: number
+  opacity: number
+}) {
+  const [_opacity, setOpacity] = useState('0')
+  const springProps = useSpring({
+    opacity: props.opacity,
+    config: { tension: 310, friction: 50 },
+  })
+
+  useFrame(() => {
+    setOpacity(clamp(springProps.opacity.get(), 0, 1).toFixed(1))
+  })
+
+  return (
+    <Outlines
+      transparent
+      thickness={props.thickness}
+      color={props.color}
+      opacity={+_opacity}
+    />
+  )
+}
+
