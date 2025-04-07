@@ -5,7 +5,7 @@ import { DefaultScene } from './scene/DefaultScene'
 import './index.css'
 import { useEffect, useState } from 'react'
 import { DEBUG, DUR, mineSpacing } from './utils/constants'
-import { clickSound, playSound } from './utils/audio'
+import { clickSound, music, playSound } from './utils/audio'
 import { stopWatch } from './hooks/useStopwatch'
 import { formatTime } from './utils'
 import { StopWatch } from './components/StopWatch'
@@ -23,6 +23,16 @@ export default function App() {
   useEffect(() => {
     setTimeout(() => setGameFade(gameStarted), DUR)
   }, [gameStarted])
+
+  useEffect(() => {
+    const onClick = () => {
+      music.play()
+    }
+    document.addEventListener('click', onClick)
+    return () => {
+      document.removeEventListener('click', onClick)
+    }
+  }, [])
 
   const onStart = (size: number, mines: number) => {
     setMineCount(mines)
