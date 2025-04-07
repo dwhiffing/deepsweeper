@@ -5,7 +5,7 @@ import { DefaultScene } from './scene/DefaultScene'
 import './index.css'
 import { useEffect, useState } from 'react'
 import { DEBUG, DUR, mineSpacing } from './utils/constants'
-import { clickSound, music, playSound } from './utils/audio'
+import { clickSound, music, playSound, toggleMute } from './utils/audio'
 import { stopWatch } from './hooks/useStopwatch'
 import { formatTime } from './utils'
 import { StopWatch } from './components/StopWatch'
@@ -31,6 +31,22 @@ export default function App() {
     document.addEventListener('click', onClick)
     return () => {
       document.removeEventListener('click', onClick)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const lowerKey = e.key.toLowerCase()
+      if (lowerKey === 'm') {
+        e.preventDefault()
+        toggleMute()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
     }
   }, [])
 

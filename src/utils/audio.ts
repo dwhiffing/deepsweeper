@@ -5,6 +5,11 @@ export const flagSound = new Audio('audio/flag.mp3')
 export const jumpSound = new Audio('audio/swim.mp3')
 export const winSound = new Audio('audio/win.mp3')
 export const music = new Audio('audio/music.mp3')
+export let muted = false
+export const toggleMute = () => {
+  muted = !muted
+  music.muted = muted
+}
 
 music.loop = true
 clickSound2.preservesPitch = false
@@ -19,6 +24,7 @@ export const playSound = (
   maxRate = 1,
   volume = 0.6,
 ) => {
+  if (muted) return
   sound.playbackRate = Math.random() * (maxRate - minRate) + minRate
   sound.volume = volume
   sound.play()
