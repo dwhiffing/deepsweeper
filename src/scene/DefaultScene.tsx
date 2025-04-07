@@ -160,6 +160,7 @@ export const DefaultScene = (props: {
   // check win condition
   useEffect(() => {
     if (
+      !hasWon &&
       boxes.every((b) =>
         b.isMine
           ? flagged.has(b.uuid)
@@ -167,11 +168,12 @@ export const DefaultScene = (props: {
       )
     ) {
       setHasWon(true)
+
       setTimeout(() => {
         props.onGameOver('win')
       }, 1000)
     }
-  }, [flagged, revealed, boxes, props])
+  }, [flagged, revealed, boxes, hasWon, props])
 
   const onGameOver = props.onGameOver
   const onCollide = useCallback(
