@@ -32,7 +32,7 @@ export const Cube = memo(
     const isHovered = props.isHovered
 
     const isEmpty = props.isRevealed && props.cube.number === 0 && !isMine
-    const size = isEmpty ? 0.175 : 0.5
+    const size = isEmpty ? 0.07 : props.isRevealed ? 0.25 : 0.5
     const [cubeRef] = useBox(() => ({
       mass: 1,
       args: [size, size, size],
@@ -154,7 +154,7 @@ function createTextTexture(
 
 // 26 is max possible
 const COLORS = {
-  '0': '#001100',
+  '0': '#111',
   '1': '#000044',
   '2': '#004400',
   '3': '#444400',

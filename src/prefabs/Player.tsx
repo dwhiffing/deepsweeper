@@ -1,4 +1,4 @@
-import { useSphere } from '@react-three/cannon'
+import { useBox } from '@react-three/cannon'
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Vector3 } from 'three'
@@ -8,17 +8,17 @@ import { jumpSound, playSound } from '../utils/audio'
 
 /** Player movement constants */
 const speed = 20
-const jumpSpeed = 2
+const jumpSpeed = 1.5
 
 export const Player = (props: { gridSize: number }) => {
   const p = props.gridSize * 1 + 2
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_sphereRef, api] = useSphere(() => ({
+  const [_ref, api] = useBox(() => ({
     mass: 100,
     fixedRotation: true,
     position: [p, 0, p],
-    args: [0.2],
-    material: { friction: 0 },
+    args: [0.2, 0.2, 0.2],
+    material: { friction: 0, restitution: 0 },
   }))
 
   const pressed = useKeyboardInput(['w', 'a', 's', 'd', ' '])
