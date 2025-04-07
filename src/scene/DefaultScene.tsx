@@ -15,6 +15,7 @@ import {
   explosionSound,
   flagSound,
   playSound,
+  winSound,
 } from '../utils/audio'
 
 extend({ PointerLockControls })
@@ -180,10 +181,13 @@ export const DefaultScene = (props: {
           : revealed.has(b.uuid) && !flagged.has(b.uuid),
       )
     ) {
-      setHasWon(true)
-
       setTimeout(() => {
-        props.onGameOver('win')
+        setHasWon(true)
+        playSound(winSound)
+
+        setTimeout(() => {
+          props.onGameOver('win')
+        }, 1000)
       }, 1000)
     }
   }, [flagged, revealed, boxes, hasWon, props])
