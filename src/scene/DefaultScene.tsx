@@ -223,7 +223,7 @@ export const DefaultScene = (props: {
   return (
     <>
       {/* <Skybox /> */}
-      <fog attach="fog" args={['#001', 1, FOG_DISTANCE]} />
+      <fog attach="fog" args={['#00001c', 1, FOG_DISTANCE]} />
       {/* @ts-expect-error pointer lock */}
       <pointerLockControls ref={controls} args={[camera, gl.domElement]} />
       <directionalLight

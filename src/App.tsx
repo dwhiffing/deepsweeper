@@ -46,13 +46,13 @@ export default function App() {
         <div
           className="transition-all inset-0 fixed z-20"
           style={{
-            backgroundColor: gameFade ? 'transparent' : '#001',
+            backgroundColor: gameFade ? 'transparent' : '#00001c',
             transitionDuration: `${gameFade ? DUR : DUR / 2}ms`,
           }}
         />
         <Crosshair />
       </UI>
-      <Canvas style={{ backgroundColor: '#001' }}>
+      <Canvas style={{ backgroundColor: '#00001c' }}>
         <DefaultScene
           gridSize={gridSize}
           spacing={mineSpacing}
@@ -78,7 +78,7 @@ export default function App() {
         className="transition-all inset-0 fixed z-20"
         style={{
           transitionDuration: `${DUR}ms`,
-          backgroundColor: menuFade ? '#001' : 'transparent',
+          backgroundColor: menuFade ? '#00001c' : 'transparent',
           pointerEvents: menuFade ? 'auto' : 'none',
         }}
       />
