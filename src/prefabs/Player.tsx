@@ -8,11 +8,11 @@ import { jumpSound, playSound } from '../utils/audio'
 import { useRefreshRate } from '../hooks/useRefreshRate'
 
 /** Player movement constants */
-const _speed = 12
-const jumpSpeed = 0.65
+const _speed = 10
+const jumpSpeed = 0.75
 
 export const Player = (props: { gridSize: number }) => {
-  const p = props.gridSize * 1 + 2
+  const p = props.gridSize * 0.4 + 2
   const refreshRate = useRefreshRate()
   const speed = _speed * (refreshRate / 60)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -91,7 +91,7 @@ export const Player = (props: { gridSize: number }) => {
 
     camera.position.set(
       state.current.pos[0],
-      state.current.pos[1] + 0.05,
+      state.current.pos[1] + 0.15,
       state.current.pos[2],
     )
 
