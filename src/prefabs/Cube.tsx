@@ -146,7 +146,7 @@ function createTextTexture(
     ? isMine
       ? '#f00'
       : COLORS[text as keyof typeof COLORS] ?? '#000'
-    : '#000011'
+    : '#000'
   ctx.fillRect(0, 0, size, size)
 
   if (text !== '0' && isRevealed) {
