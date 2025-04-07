@@ -11,6 +11,7 @@ const speed = 20
 const jumpSpeed = 2
 
 export const Player = (props: { gridSize: number }) => {
+  const p = props.gridSize * 1 + 2
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_sphereRef, api] = useSphere(() => ({
     mass: 100,
@@ -19,7 +20,6 @@ export const Player = (props: { gridSize: number }) => {
     args: [0.2],
     material: { friction: 0 },
   }))
-  const p = props.gridSize * 1 + 2
 
   const pressed = useKeyboardInput(['w', 'a', 's', 'd', ' '])
   const input = useVariable(pressed)
@@ -34,8 +34,10 @@ export const Player = (props: { gridSize: number }) => {
   useEffect(() => {
     api.velocity.subscribe((v) => (state.current.vel = v))
     api.position.subscribe((v) => (state.current.pos = v))
-    camera.lookAt(new Vector3(-4, 0, 0))
-  }, [api, camera])
+    setTimeout(() => {
+      camera.lookAt(new Vector3(0, p, 0))
+    }, 500)
+  }, [api, camera, p])
 
   useFrame((_, delta) => {
     const { w, s, a, d } = input.current
