@@ -51,7 +51,7 @@ export const DefaultScene = (props: {
     const cube = boxes.find((b) => b.uuid == uuid)
 
     if (!uuid) {
-      playSound(clickSound2, 0.7, 1.2)
+      playSound(clickSound2, 0.9, 1.1)
       return
     }
 
@@ -96,7 +96,7 @@ export const DefaultScene = (props: {
 
     // if you reveal a revealed cube that is marked 0, reveal all adjacent
     if (revealed.has(uuid) && cube && cube.number === 0) {
-      playSound(clickSound, 0.7, 1.2)
+      playSound(clickSound, 0.9, 1.1)
       const neighbors = getAdjacent(cube, ref.current.cubeMap)
       setRevealed((r) => {
         neighbors.forEach((n) => {
@@ -105,14 +105,14 @@ export const DefaultScene = (props: {
         return new Set(r)
       })
     } else if (!revealed.has(uuid)) {
-      playSound(clickSound, 0.7, 1.2)
+      playSound(clickSound, 0.9, 1.1)
       // else just reveal that cube
       setRevealed((r) => {
         r.add(uuid)
         return new Set(r)
       })
     } else {
-      playSound(clickSound2, 0.7, 1.2)
+      playSound(clickSound2, 0.9, 1.1)
     }
   })
 
