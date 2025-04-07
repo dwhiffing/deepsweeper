@@ -98,7 +98,14 @@ export default function App() {
           </p>
           {gameState === 'win' && <p>Time: {formatTime(lastTime)}</p>}
           <div>
-            <button onClick={() => setShowButtons(true)}>Start Game</button>
+            <button
+              onClick={() => {
+                playSound(clickSound)
+                setShowButtons(true)
+              }}
+            >
+              Start Game
+            </button>
           </div>
         </div>
       )}
