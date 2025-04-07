@@ -348,7 +348,7 @@ export const DefaultScene = (props: {
 
 const spearCounts: Record<number, number> = {
   3: 1,
-  4: 1,
-  5: 2,
-  7: 3,
+  4: 2,
+  5: 3,
+  7: 4,
 }
