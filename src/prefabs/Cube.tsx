@@ -22,6 +22,7 @@ export const Cube = memo(
     isHovered?: boolean
     isSelected?: boolean
     isDimmed?: boolean
+    hasWon?: boolean
     isRevealed?: boolean
     isFlagged?: boolean
     onCollide?: (cube: Cube) => void
@@ -102,7 +103,9 @@ export const Cube = memo(
         >
           {text}
         </Text>
-        {props.isFlagged && <PulsingLight />}
+        {props.isFlagged && (
+          <PulsingLight color={props.hasWon ? '#0a0' : '#a00'} />
+        )}
       </mesh>
     )
   },

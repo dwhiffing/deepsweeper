@@ -106,13 +106,13 @@ export const FakeGlowMaterial = ({
   )
 }
 
-export const PulsingLight = () => {
+export const PulsingLight = (props: { color: string }) => {
   return (
     <mesh position={[0, 0, 0]}>
       <sphereGeometry args={[0.2, 16, 16]} />
       <meshStandardMaterial />
       <FakeGlowMaterial
-        glowColor="#aa0000"
+        glowColor={props.color}
         glowInternalRadius={4}
         falloff={2}
       />

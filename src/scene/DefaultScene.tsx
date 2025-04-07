@@ -32,6 +32,7 @@ export const DefaultScene = (props: {
   const [revealed, setRevealed] = useState<Set<string>>(new Set())
   const [flagged, setFlagged] = useState<Set<string>>(new Set())
   const [activeBoxes, setActiveBoxes] = useState<string[]>([])
+  const [hasWon, setHasWon] = useState(false)
   const groupRef = useRef<Group>(null)
 
   useEffect(() => {
@@ -69,7 +70,10 @@ export const DefaultScene = (props: {
 
         // if all mines are flagged, you win
         if (boxes.filter((b) => b.isMine).every((b) => f.has(b.uuid))) {
-          props.onGameOver('win')
+          setHasWon(true)
+          setTimeout(() => {
+            props.onGameOver('win')
+          }, 1000)
         }
         return new Set(f)
       })
@@ -177,6 +181,7 @@ export const DefaultScene = (props: {
             <Cube
               key={i}
               cube={cube}
+              hasWon={hasWon}
               isRevealed={revealed.has(cube.uuid)}
               isFlagged={flagged.has(cube.uuid)}
               isHovered={activeBoxes.includes(cube.uuid)}
