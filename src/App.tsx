@@ -5,9 +5,10 @@ import { DefaultScene } from './scene/DefaultScene'
 import './index.css'
 import { useEffect, useState } from 'react'
 import { DEBUG, DUR, mineSpacing } from './utils/constants'
-import { clickSound } from './utils/audio'
-import { useStopwatch } from './hooks/useStopwatch'
+import { clickSound, playSound } from './utils/audio'
+import { stopWatch } from './hooks/useStopwatch'
 import { formatTime } from './utils'
+import { StopWatch } from './components/StopWatch'
 
 export default function App() {
   const [gameStarted, setGameStarted] = useState(DEBUG)
@@ -26,27 +27,20 @@ export default function App() {
     setMineCount(mines)
     setGridSize(size)
     setMenuFade(true)
-    clickSound.play()
+    playSound(clickSound)
     setTimeout(() => setGameStarted(true), DUR)
   }
 
-  const stopWatch = useStopwatch()
   useEffect(() => {
-    if (gameStarted) {
-      stopWatch.start()
-    } else {
+    if (!gameStarted) {
       setShowButtons(false)
-      stopWatch.stop()
     }
-    // eslint-disable-next-line
   }, [gameStarted])
 
   return gameStarted ? (
     <>
       <UI>
-        <p className="text-white z-20 absolute top-2 right-2">
-          {formatTime(stopWatch.elapsed)}
-        </p>
+        <StopWatch gameStarted={gameStarted} />
         <div
           className="transition-all inset-0 fixed z-20"
           style={{
@@ -64,8 +58,9 @@ export default function App() {
           onGameOver={(state: string) => {
             setGameFade(false)
             setGameState(state)
-            setLastTime(stopWatch.elapsed)
-            stopWatch.reset()
+            const { time, reset } = stopWatch.getState()
+            setLastTime(time)
+            reset()
 
             setTimeout(() => {
               setGameStarted(false)

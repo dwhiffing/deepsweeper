@@ -35,6 +35,7 @@ export const DefaultScene = (props: {
   const [hasWon, setHasWon] = useState(false)
   const groupRef = useRef<Group>(null)
 
+  // pointer lock
   useEffect(() => {
     const handleFocus = () => controls.current?.lock()
     if (!DEBUG) controls.current?.lock()
@@ -44,6 +45,7 @@ export const DefaultScene = (props: {
     }
   }, [])
 
+  // on click
   useMouseInput((button: number) => {
     const uuid = activeBoxes[0]
     const cube = boxes.find((b) => b.uuid == uuid)
@@ -185,7 +187,6 @@ export const DefaultScene = (props: {
       >
         <Player gridSize={props.gridSize} />
         <Plane />
-        {/* <PulsingLight /> */}
         <group ref={groupRef}>
           {boxes.map((cube, i) => (
             <Cube

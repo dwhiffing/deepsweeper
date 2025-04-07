@@ -1,44 +1,56 @@
-import { useEffect, useRef, useState } from 'react'
+import { createStore } from 'zustand'
 
-export function useStopwatch(startOnMount = true) {
-  const [elapsed, setElapsed] = useState(0)
-  const startTime = useRef<number | null>(null)
-  const animationFrame = useRef<number | null>(null)
-  const running = useRef(false)
-
+let animationFrame: number | null = null
+export const stopWatch = createStore<{
+  running: boolean
+  setRunning: (t: boolean) => void
+  time: number
+  setTime: (t: number) => void
+  startTime: number
+  setStartTime: (t: number) => void
+  start: () => void
+  stop: () => void
+  reset: () => void
+}>((set, get) => {
   const update = (time: number) => {
-    if (startTime.current !== null) {
-      setElapsed(time - startTime.current)
+    if (get().startTime) {
+      set({ time: time - get().startTime })
     }
-    animationFrame.current = requestAnimationFrame(update)
+
+    animationFrame = requestAnimationFrame(update)
   }
 
   const start = () => {
-    if (!running.current) {
-      startTime.current = performance.now() - elapsed
-      animationFrame.current = requestAnimationFrame(update)
-      running.current = true
+    if (!get().running) {
+      set({ startTime: performance.now() - get().time })
+
+      animationFrame = requestAnimationFrame(update)
+      set({ running: true })
     }
   }
 
   const stop = () => {
-    if (animationFrame.current) {
-      cancelAnimationFrame(animationFrame.current)
-      animationFrame.current = null
+    if (animationFrame) {
+      cancelAnimationFrame(animationFrame)
+      animationFrame = null
     }
-    running.current = false
+    set({ running: false })
   }
 
   const reset = () => {
     stop()
-    setElapsed(0)
-    startTime.current = null
+    set({ time: 0, startTime: 0 })
   }
 
-  useEffect(() => {
-    if (startOnMount) start()
-    return stop
-  }, [startOnMount])
-
-  return { elapsed, start, stop, reset, running: running.current }
-}
+  return {
+    running: false,
+    time: 0,
+    startTime: 0,
+    setTime: (time: number) => set({ time }),
+    setStartTime: (startTime: number) => set({ startTime }),
+    setRunning: (running: boolean) => set({ running }),
+    start,
+    stop,
+    reset,
+  }
+})
