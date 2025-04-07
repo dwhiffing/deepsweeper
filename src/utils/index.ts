@@ -73,22 +73,42 @@ const assignMines = (
     }
   }
 }
+export const getAdjacent = (
+  cube: Cube,
+  cubeMap: Record<string, Cube>,
+  recurse = false,
+  visited = new Set<string>(),
+): Cube[] => {
+  const key = `${cube.x},${cube.y},${cube.z}`
+  if (visited.has(key)) return []
+  visited.add(key)
 
-export const getAdjacent = (cube: Cube, cubeMap: Record<string, Cube>) => {
-  const neighbors = []
+  const neighbors: Cube[] = []
+
   for (const dx of directions) {
     for (const dy of directions) {
       for (const dz of directions) {
         if (dx === 0 && dy === 0 && dz === 0) continue
-        const neighbor = cubeMap[`${cube.x + dx},${cube.y + dy},${cube.z + dz}`]
-        if (neighbor) neighbors.push(neighbor)
+
+        const nx = cube.x + dx
+        const ny = cube.y + dy
+        const nz = cube.z + dz
+        const nKey = `${nx},${ny},${nz}`
+
+        const neighbor = cubeMap[nKey]
+        if (!neighbor || visited.has(nKey)) continue
+
+        neighbors.push(neighbor)
+
+        if (neighbor.number === 0 && recurse) {
+          neighbors.push(...getAdjacent(neighbor, cubeMap, recurse, visited))
+        }
       }
     }
   }
 
   return neighbors
 }
-
 export function formatTime(s: number) {
   const totalSeconds = Math.floor(s / 1000)
   const minutes = Math.floor(totalSeconds / 60)
@@ -98,4 +118,16 @@ export function formatTime(s: number) {
     2,
     '0',
   )}`
+}
+
+export function chunk<T>(arr: T[], size: number): T[][] {
+  if (size <= 0) throw new Error('Chunk size must be greater than 0')
+
+  const result: T[][] = []
+
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size))
+  }
+
+  return result
 }

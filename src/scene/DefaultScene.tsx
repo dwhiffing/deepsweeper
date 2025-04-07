@@ -7,7 +7,7 @@ import { Player } from '../prefabs/Player'
 import { Cube } from '../prefabs/Cube'
 import { Group, Raycaster, Vector2 } from 'three'
 import { useMouseInput } from '../hooks/useMouseInput'
-import { getAdjacent, getBoxes } from '../utils'
+import { chunk, getAdjacent, getBoxes } from '../utils'
 import { DEBUG, FOG_DISTANCE } from '../utils/constants'
 import {
   clickSound,
@@ -95,22 +95,29 @@ export const DefaultScene = (props: {
     if (flagged.has(uuid)) return
 
     // if you reveal a revealed cube that is marked 0, reveal all adjacent
-    if (revealed.has(uuid) && cube && cube.number === 0) {
+    if (cube && !revealed.has(uuid)) {
       playSound(clickSound, 0.9, 1.1)
-      const neighbors = getAdjacent(cube, ref.current.cubeMap)
-      setRevealed((r) => {
-        neighbors.forEach((n) => {
-          if (!flagged.has(n.uuid)) r.add(n.uuid)
-        })
-        return new Set(r)
-      })
-    } else if (!revealed.has(uuid)) {
-      playSound(clickSound, 0.9, 1.1)
-      // else just reveal that cube
+
       setRevealed((r) => {
         r.add(uuid)
         return new Set(r)
       })
+
+      // reveal neighbours recursively
+      if (cube.number === 0) {
+        const neighbors = getAdjacent(cube, ref.current.cubeMap, true)
+        // reveal 7 at a time every 30ms for slightly better performance
+        chunk(neighbors, 7).forEach((chunk, i) => {
+          setTimeout(() => {
+            chunk.forEach((n) => {
+              setRevealed((r) => {
+                r.add(n.uuid)
+                return new Set(r)
+              })
+            })
+          }, 30 * i)
+        })
+      }
     } else {
       playSound(clickSound2, 0.9, 1.1)
     }
