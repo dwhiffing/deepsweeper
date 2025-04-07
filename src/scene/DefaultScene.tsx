@@ -127,7 +127,7 @@ export const DefaultScene = (props: {
 
     // if you reveal a revealed cube that is marked 0, reveal all adjacent
     if (cube && !revealed.has(uuid)) {
-      playSound(clickSound, 0.9, 1.1)
+      playSound(clickSound, 0.9, 1.1, 0.35)
 
       setRevealed((r) => {
         r.add(uuid)

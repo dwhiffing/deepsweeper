@@ -54,7 +54,7 @@ export default function App() {
     setMineCount(mines)
     setGridSize(size)
     setMenuFade(true)
-    playSound(clickSound)
+    playSound(clickSound, 0.9, 1.1, 0.35)
     setTimeout(() => setGameStarted(true), DUR)
   }
 
@@ -129,7 +129,7 @@ export default function App() {
           <div>
             <button
               onClick={() => {
-                playSound(clickSound)
+                playSound(clickSound, 0.9, 1.1, 0.35)
                 setShowButtons(true)
               }}
             >
