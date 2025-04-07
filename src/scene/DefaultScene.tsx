@@ -45,6 +45,14 @@ export const DefaultScene = (props: {
   const groupRef = useRef<Group>(null)
   const refreshRate = useRefreshRate()
 
+  const onGameOver = props.onGameOver
+  const onLose = useCallback(() => {
+    playSound(explosionSound)
+    setTimeout(() => {
+      onGameOver('lose')
+    }, 500)
+  }, [onGameOver])
+
   // reset stats: spears
   useEffect(() => {
     mineStatsStore.setState({ spears: 1 })
@@ -140,7 +148,27 @@ export const DefaultScene = (props: {
     // if right click, flag cube
     if (button === 2) {
       // if cube is already revealed, we cant flag it
-      if (revealed.has(uuid)) return
+      if (revealed.has(uuid)) {
+        // check if mine has an equal number of flagged members to its number, if so, reveal all unrevealed and unflagged neighbours
+        const neighbors = getAdjacent(cube, ref.current.cubeMap)
+        const flaggedNeighborCount = neighbors.filter((n) =>
+          flagged.has(n.uuid),
+        ).length
+        if (flaggedNeighborCount === cube.number) {
+          const unrevealedNeighbors = neighbors.filter(
+            (n) => !revealed.has(n.uuid) && !flagged.has(n.uuid),
+          )
+          if (unrevealedNeighbors.some((n) => n.isMine)) {
+            onLose()
+          }
+
+          setRevealed((r) => {
+            unrevealedNeighbors.forEach((n) => r.add(n.uuid))
+            return new Set(r)
+          })
+        }
+        return
+      }
 
       setFlagged((f) => {
         // toggle flag
@@ -165,10 +193,7 @@ export const DefaultScene = (props: {
 
     // if you reveal a mine, you lose
     if (cube?.isMine) {
-      playSound(explosionSound)
-      setTimeout(() => {
-        props.onGameOver('lose')
-      }, 500)
+      onLose()
       setRevealed((r) => {
         r.add(uuid)
         return new Set(r)
@@ -260,15 +285,13 @@ export const DefaultScene = (props: {
     }
   }, [flagged, revealed, boxes, hasWon, props])
 
-  const onGameOver = props.onGameOver
   const onCollide = useCallback(
     (cube: Cube) => {
       if (cube.isMine) {
-        playSound(explosionSound)
-        onGameOver('lose')
+        onLose()
       }
     },
-    [onGameOver],
+    [onLose],
   )
 
   return (
