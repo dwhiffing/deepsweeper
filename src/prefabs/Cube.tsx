@@ -63,11 +63,18 @@ export const Cube = memo(
         `${props.cube.number}`,
         !!props.isRevealed,
         !!props.isFlagged,
+        !!props.hasWon,
         isMine,
       )
 
       return new Array(6).fill('').map(() => new MeshBasicMaterial({ map }))
-    }, [props.cube.number, props.isFlagged, props.isRevealed, isMine])
+    }, [
+      props.cube.number,
+      props.isFlagged,
+      props.isRevealed,
+      isMine,
+      props.hasWon,
+    ])
 
     return (
       <mesh ref={cubeRef} uuid={uuid} castShadow>
@@ -122,6 +129,7 @@ function createTextTexture(
   text: string,
   isRevealed: boolean,
   isFlagged: boolean,
+  hasWon: boolean,
   isMine: boolean,
 ) {
   const size = 512
@@ -131,7 +139,9 @@ function createTextTexture(
   const ctx = canvas.getContext('2d')!
 
   ctx.fillStyle = isFlagged
-    ? '#100'
+    ? hasWon
+      ? '#010'
+      : '#100'
     : isRevealed
     ? isMine
       ? '#f00'
