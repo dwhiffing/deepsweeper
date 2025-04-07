@@ -57,7 +57,7 @@ export const Cube = memo(
       }
     })
 
-    const outlineOpacity = isHovered || props.isSelected ? 1 : 0.3
+    const outlineOpacity = props.isSelected ? 1 : isHovered ? 0.8 : 0.2
     const materials = useMemo(() => {
       const map = createTextTexture(
         `${props.cube.number}`,
@@ -77,8 +77,8 @@ export const Cube = memo(
         <meshBasicMaterial attach="material" args={materials} fog={true} />
         {!isColliding && (
           <AnimatedOutlines
-            thickness={props.isSelected || props.isHovered ? 6 : 2}
-            color={props.isSelected ? '#ff0' : '#fff'}
+            thickness={props.isSelected ? 8 : props.isHovered ? 4 : 2}
+            color={props.isHovered && !props.isSelected ? '#ff0' : '#fff'}
             opacity={outlineOpacity}
           />
         )}
