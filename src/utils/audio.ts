@@ -15,6 +15,7 @@ export const playSound = (
   maxRate = 1,
 ) => {
   sound.playbackRate = Math.random() * (maxRate - minRate) + minRate
+  sound.volume = 0.6
   sound.play()
   sound.playbackRate = 1
 }

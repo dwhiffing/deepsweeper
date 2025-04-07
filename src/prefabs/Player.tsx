@@ -4,7 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Vector3 } from 'three'
 import { useKeyboardInput } from '../hooks/useKeyboardInput'
 import { useVariable } from '../hooks/useVariable'
-import { jumpSound } from '../utils/audio'
+import { jumpSound, playSound } from '../utils/audio'
 
 /** Player movement constants */
 const speed = 20
@@ -93,7 +93,7 @@ export const Player = (props: { gridSize: number }) => {
     )
 
     if (space) {
-      jumpSound.play()
+      playSound(jumpSound)
       api.velocity.set(state.current.vel[0], jumpSpeed, state.current.vel[2])
     }
   })

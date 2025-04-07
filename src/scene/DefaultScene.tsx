@@ -63,10 +63,10 @@ export const DefaultScene = (props: {
       setFlagged((f) => {
         // toggle flag
         if (f.has(uuid)) {
-          clickSound2.play()
+          playSound(clickSound2)
           f.delete(uuid)
         } else {
-          flagSound.play()
+          playSound(flagSound)
           f.add(uuid)
         }
 
@@ -80,7 +80,7 @@ export const DefaultScene = (props: {
 
     // if you reveal a mine, you lose
     if (cube?.isMine) {
-      explosionSound.play()
+      playSound(explosionSound)
       setTimeout(() => {
         props.onGameOver('lose')
       }, 500)
@@ -116,24 +116,23 @@ export const DefaultScene = (props: {
     }
   })
 
+  // on frame
   useFrame(({ camera }) => {
-    if (groupRef.current) {
-      const raycaster = new Raycaster()
-      raycaster.setFromCamera(new Vector2(0, 0), camera) // center of screen
-      const children = groupRef.current.children
-      const intersects = raycaster.intersectObjects(children)
-
-      // highlights all cubes adjacent to the hovered cube
-      const uuid = intersects[0]?.object.uuid ?? ''
-      const cube = boxes.find((b) => b.uuid == uuid)
-      const adjacent = cube ? getAdjacent(cube, ref.current.cubeMap) : []
-      const ids = [uuid, ...adjacent.map((c) => c.uuid)]
-      if (activeBoxes.join(':') !== ids.join(':')) {
-        setActiveBoxes(ids.filter(Boolean))
-      }
+    if (!groupRef.current) return
+    const raycaster = new Raycaster()
+    raycaster.setFromCamera(new Vector2(0, 0), camera) // center of screen
+    const intersects = raycaster.intersectObjects(groupRef.current.children)
+    // highlights all cubes adjacent to the hovered cube
+    const uuid = intersects[0]?.object.uuid ?? ''
+    const cube = boxes.find((b) => b.uuid == uuid)
+    const adjacent = cube ? getAdjacent(cube, ref.current.cubeMap) : []
+    const ids = [uuid, ...adjacent.map((c) => c.uuid)]
+    if (activeBoxes.join(':') !== ids.join(':')) {
+      setActiveBoxes(ids.filter(Boolean))
     }
   })
 
+  // check win condition
   useEffect(() => {
     if (
       boxes.every((b) =>
@@ -153,7 +152,7 @@ export const DefaultScene = (props: {
   const onCollide = useCallback(
     (cube: Cube) => {
       if (cube.isMine) {
-        explosionSound.play()
+        playSound(explosionSound)
         onGameOver('lose')
       }
     },
