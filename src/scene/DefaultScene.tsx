@@ -65,7 +65,7 @@ export const DefaultScene = (props: {
     const cube = boxes.find((b) => b.uuid == uuid)
 
     if (!uuid) {
-      playSound(clickSound2, 0.9, 1.1)
+      playSound(clickSound2, 0.9, 1.1, 0.4)
       return
     }
 
@@ -133,7 +133,7 @@ export const DefaultScene = (props: {
         })
       }
     } else {
-      playSound(clickSound2, 0.9, 1.1)
+      playSound(clickSound2, 0.9, 1.1, 0.4)
     }
   })
 

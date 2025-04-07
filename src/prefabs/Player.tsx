@@ -93,7 +93,7 @@ export const Player = (props: { gridSize: number }) => {
     )
 
     if (space) {
-      playSound(jumpSound)
+      playSound(jumpSound, 0.6, 0.7, 0.2)
       api.velocity.set(state.current.vel[0], jumpSpeed, state.current.vel[2])
     }
   })
