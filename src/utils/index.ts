@@ -88,3 +88,14 @@ export const getAdjacent = (cube: Cube, cubeMap: Record<string, Cube>) => {
 
   return neighbors
 }
+
+export function formatTime(s: number) {
+  const totalSeconds = Math.floor(s / 1000)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+
+  return `${String(minutes).padStart(1, '0')}:${String(seconds).padStart(
+    2,
+    '0',
+  )}`
+}

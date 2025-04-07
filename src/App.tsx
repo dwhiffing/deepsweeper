@@ -6,6 +6,8 @@ import './index.css'
 import { useEffect, useState } from 'react'
 import { DEBUG, DUR, mineSpacing } from './utils/constants'
 import { clickSound } from './utils/audio'
+import { useStopwatch } from './hooks/useStopwatch'
+import { formatTime } from './utils'
 
 export default function App() {
   const [gameStarted, setGameStarted] = useState(DEBUG)
@@ -13,6 +15,7 @@ export default function App() {
   const [gameState, setGameState] = useState('')
   const [menuFade, setMenuFade] = useState(false)
   const [gridSize, setGridSize] = useState(3)
+  const [lastTime, setLastTime] = useState(0)
   const [mineCount, setMineCount] = useState(3)
   const [showButtons, setShowButtons] = useState(false)
   useEffect(() => {
@@ -27,9 +30,23 @@ export default function App() {
     setTimeout(() => setGameStarted(true), DUR)
   }
 
+  const stopWatch = useStopwatch()
+  useEffect(() => {
+    if (gameStarted) {
+      stopWatch.start()
+    } else {
+      setShowButtons(false)
+      stopWatch.stop()
+    }
+    // eslint-disable-next-line
+  }, [gameStarted])
+
   return gameStarted ? (
     <>
       <UI>
+        <p className="text-white z-20 absolute top-2 right-2">
+          {formatTime(stopWatch.elapsed)}
+        </p>
         <div
           className="transition-all inset-0 fixed z-20"
           style={{
@@ -47,6 +64,8 @@ export default function App() {
           onGameOver={(state: string) => {
             setGameFade(false)
             setGameState(state)
+            setLastTime(stopWatch.elapsed)
+            stopWatch.reset()
 
             setTimeout(() => {
               setGameStarted(false)
@@ -82,6 +101,7 @@ export default function App() {
               ? 'You win!'
               : "Sweep the mines and don't die"}
           </p>
+          {gameState === 'win' && <p>Time: {formatTime(lastTime)}</p>}
           <div>
             <button onClick={() => setShowButtons(true)}>Start Game</button>
           </div>
