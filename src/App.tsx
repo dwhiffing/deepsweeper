@@ -12,7 +12,10 @@ import { StopWatch } from './components/StopWatch'
 import { MineStats } from './components/MineStats'
 
 export default function App() {
-  const [orbitMode, setOrbitMode] = useState(true)
+  const initialOrbitMode = JSON.parse(
+    localStorage.getItem('deepsweeper:orbit-mode') ?? 'false',
+  )
+  const [orbitMode, setOrbitMode] = useState(initialOrbitMode)
   const [gameStarted, setGameStarted] = useState(DEBUG)
   const [gameFade, setGameFade] = useState(false)
   const [gameState, setGameState] = useState('')
@@ -141,6 +144,10 @@ export default function App() {
               className="bg-transparent! border text-white!"
               onClick={() => {
                 playSound(clickSound, 0.9, 1.1, 0.35)
+                localStorage.setItem(
+                  'deepsweeper:orbit-mode',
+                  orbitMode ? 'false' : 'true',
+                )
                 setOrbitMode(!orbitMode)
               }}
             >
