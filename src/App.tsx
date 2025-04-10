@@ -12,8 +12,9 @@ import { StopWatch } from './components/StopWatch'
 import { MineStats } from './components/MineStats'
 
 export default function App() {
+  const isTouchDevice = window.matchMedia('(pointer: coarse)').matches
   const initialOrbitMode = JSON.parse(
-    localStorage.getItem('deepsweeper:orbit-mode') ?? 'false',
+    localStorage.getItem('deepsweeper:orbit-mode') ?? `${isTouchDevice}`,
   )
   const [orbitMode, setOrbitMode] = useState(initialOrbitMode)
   const [gameStarted, setGameStarted] = useState(DEBUG)
@@ -140,19 +141,21 @@ export default function App() {
             >
               Start Game
             </button>
-            <button
-              className="bg-transparent! border text-white!"
-              onClick={() => {
-                playSound(clickSound, 0.9, 1.1, 0.35)
-                localStorage.setItem(
-                  'deepsweeper:orbit-mode',
-                  orbitMode ? 'false' : 'true',
-                )
-                setOrbitMode(!orbitMode)
-              }}
-            >
-              Orbit mode: {orbitMode ? 'on' : 'off'}
-            </button>
+            {!isTouchDevice && (
+              <button
+                className="bg-transparent! border text-white!"
+                onClick={() => {
+                  playSound(clickSound, 0.9, 1.1, 0.35)
+                  localStorage.setItem(
+                    'deepsweeper:orbit-mode',
+                    orbitMode ? 'false' : 'true',
+                  )
+                  setOrbitMode(!orbitMode)
+                }}
+              >
+                Orbit mode: {orbitMode ? 'on' : 'off'}
+              </button>
+            )}
           </div>
         </div>
       )}
