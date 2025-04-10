@@ -48,6 +48,7 @@ export const DefaultScene = (props: {
 
   const controls = useRef<PointerLockControls>(null)
   const lastUuid = useRef('')
+  const winCheckTriggered = useRef(false)
   const pointerDownPos = useRef({ x: 0, y: 0 })
   const lastPointerPos = useRef({ x: 0, y: 0 })
   const frameCount = useRef(0)
@@ -63,6 +64,8 @@ export const DefaultScene = (props: {
 
   const onRevealCube = useCallback(
     (cube: Cube) => {
+      if (winCheckTriggered.current) return
+
       if (revealed.size === 0) {
         assignMines(gridSize, mineCount, ref.current.cubeMap, activeBoxes[0])
       }
@@ -113,6 +116,8 @@ export const DefaultScene = (props: {
 
   const onFlagCube = useCallback(
     (cube: Cube) => {
+      if (winCheckTriggered.current) return
+
       // if cube is already revealed, we cant flag it
       if (revealed.has(cube.uuid)) {
         // check if mine has an equal number of flagged members to its number, if so, reveal all unrevealed and unflagged neighbours
@@ -152,7 +157,8 @@ export const DefaultScene = (props: {
   )
 
   const onSpearCube = useCallback(() => {
-    if (mineStatsStore.getState().spears === 0) return
+    if (winCheckTriggered.current || mineStatsStore.getState().spears === 0)
+      return
 
     if (revealed.size === 0) {
       assignMines(gridSize, mineCount, ref.current.cubeMap, activeBoxes[0])
@@ -376,13 +382,14 @@ export const DefaultScene = (props: {
   // check win condition
   useEffect(() => {
     if (
-      !hasWon &&
+      !winCheckTriggered.current &&
       ref.current.boxes.every((b) =>
         b.isMine
           ? flagged.has(b.uuid)
           : revealed.has(b.uuid) && !flagged.has(b.uuid),
       )
     ) {
+      winCheckTriggered.current = true
       setTimeout(() => {
         setHasWon(true)
         playSound(winSound)
