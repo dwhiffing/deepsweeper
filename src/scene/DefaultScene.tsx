@@ -300,6 +300,7 @@ export const DefaultScene = (props: {
         // and the position we put it down at
         frameCount.current = 0
         pointerDownPos.current = { x, y }
+        lastPointerPos.current = { x, y }
         return
       }
 
@@ -313,7 +314,7 @@ export const DefaultScene = (props: {
       }
     },
     // on up
-    (button, x, y) => {
+    (button) => {
       // if not orbit mode, mouse up does nothing
       // if frameCount is -1, we've handled a long press action already
       // and should ignore the mouse up
@@ -323,6 +324,7 @@ export const DefaultScene = (props: {
 
       // ignore if the pointer has moved from its start position
       // to avoid performing actions when you just meant to orbit
+      const { x, y } = lastPointerPos.current
       if (getDist(pointerDownPos.current, { x, y }) > 5) return
 
       const newCube = getCubeAt(x, y)

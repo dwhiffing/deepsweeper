@@ -27,15 +27,32 @@ export const useMouseInput = (
     const handleMouseMove = (e: MouseEvent) => {
       onMouseMove?.(e.clientX, e.clientY)
     }
+    const handleTouchDown = (e: TouchEvent) => {
+      onMouseDown?.(-1, e.touches[0].clientX, e.touches[0].clientY)
+    }
+    const handleTouchUp = () => {
+      onMouseUp?.(-1, 0, 0)
+    }
+    const handleTouchMove = (e: TouchEvent) => {
+      onMouseMove?.(e.touches[0].clientX, e.touches[0].clientY)
+    }
 
     document.addEventListener('mousedown', handleMouseDown)
     document.addEventListener('mouseup', handleMouseUp)
     document.addEventListener('mousemove', handleMouseMove)
 
+    document.addEventListener('touchstart', handleTouchDown)
+    document.addEventListener('touchend', handleTouchUp)
+    document.addEventListener('touchmove', handleTouchMove)
+
     return () => {
       document.removeEventListener('mousedown', handleMouseDown)
       document.removeEventListener('mouseup', handleMouseUp)
       document.removeEventListener('mousemove', handleMouseMove)
+
+      document.removeEventListener('touchstart', handleTouchDown)
+      document.removeEventListener('touchend', handleTouchUp)
+      document.removeEventListener('touchmove', handleTouchMove)
     }
   }, [onMouseDown, onMouseUp, onMouseMove])
 
