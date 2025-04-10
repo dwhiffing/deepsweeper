@@ -220,7 +220,12 @@ export const DefaultScene = (props: {
   // reset stats: spears
   useEffect(() => {
     mineStatsStore.setState({ spears: spearCounts[gridSize] })
-  }, [gridSize])
+    camera.position.set(
+      gridSize * 0.4 + 2,
+      gridSize * 0.4 + 2,
+      gridSize * 0.4 + 2,
+    )
+  }, [gridSize, camera])
 
   // reset stats: mine count
   useEffect(() => {
@@ -424,7 +429,7 @@ export const DefaultScene = (props: {
         {!orbitMode && (
           <>
             <Player gridSize={gridSize} />
-            <Plane />
+            <Plane gridSize={gridSize} />
           </>
         )}
         <group ref={groupRef}>
@@ -444,11 +449,7 @@ export const DefaultScene = (props: {
         </group>
       </Physics>
       {orbitMode ? (
-        <OrbitControls
-          enabled
-          camera={camera}
-          target={new Vector3(0, (gridSize * (0.5 + spacing)) / 4, 0)}
-        />
+        <OrbitControls enabled camera={camera} target={new Vector3(0, 0, 0)} />
       ) : (
         // @ts-expect-error pointer lock
         <pointerLockControls ref={controls} args={[camera, gl.domElement]} />

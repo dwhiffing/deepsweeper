@@ -5,6 +5,7 @@ import { memo, useMemo, useRef, useState } from 'react'
 import { CanvasTexture, Mesh, MeshBasicMaterial } from 'three'
 import { useSpring } from '@react-spring/three'
 import { PulsingLight } from './PulsingLight'
+import { mineSize } from '../utils/constants'
 
 export type Cube = {
   position: Triplet
@@ -31,7 +32,11 @@ export const Cube = memo(
     const isHovered = props.isHovered
 
     const isEmpty = props.isRevealed && props.cube.number === 0 && !isMine
-    const size = isEmpty ? 0.07 : props.isRevealed ? 0.25 : 0.5
+    const size = isEmpty
+      ? mineSize / 10
+      : props.isRevealed
+      ? mineSize / 2
+      : mineSize
     const [cubeRef] = useBox(() => ({
       mass: 1,
       args: [size, size, size],

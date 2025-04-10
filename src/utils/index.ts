@@ -2,12 +2,14 @@ import { Triplet } from '@react-three/cannon'
 import { v4 as uuidv4 } from 'uuid'
 import { Cube } from '../prefabs/Cube'
 import { createStore } from 'zustand'
+import { mineSize } from './constants'
 
 const directions = [-1, 0, 1]
 
 export const getBoxes = (gridSize: number, sp: number) => {
   const boxes = []
   const cubeMap: Record<string, Cube> = {}
+  const size = mineSize + sp
 
   for (let x = 0; x < gridSize; x++) {
     for (let y = 0; y < gridSize; y++) {
@@ -15,9 +17,9 @@ export const getBoxes = (gridSize: number, sp: number) => {
         const cube = {
           uuid: uuidv4(),
           position: [
-            x * sp - gridSize / 2 + 0.5,
-            y * sp - gridSize / 2 + 0.5 + 0.5 * gridSize,
-            z * sp - gridSize / 2 + 0.5,
+            x * size - (gridSize / 2) * size + size / 2,
+            y * size - (gridSize / 2) * size + size / 2,
+            z * size - (gridSize / 2) * size + size / 2,
           ] as Triplet,
           x,
           y,

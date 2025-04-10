@@ -6,20 +6,22 @@ import { useKeyboardInput } from '../hooks/useKeyboardInput'
 import { useVariable } from '../hooks/useVariable'
 import { jumpSound, playSound } from '../utils/audio'
 import { useRefreshRate } from '../hooks/useRefreshRate'
+import { mineSize, mineSpacing } from '../utils/constants'
 
 /** Player movement constants */
 const _speed = 10
 const jumpSpeed = 0.75
 
 export const Player = (props: { gridSize: number }) => {
-  const p = props.gridSize * 0.4 + 2
+  const x = props.gridSize * 0.4 + 2
+  const y = ((props.gridSize * mineSize + mineSpacing) / 2 + mineSize) * -1
   const refreshRate = useRefreshRate()
   const speed = _speed * (refreshRate / 60)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_ref, api] = useSphere(() => ({
     mass: 100,
     fixedRotation: true,
-    position: [p, 0, p],
+    position: [x, y, x],
     args: [0.02],
     material: { friction: 0, restitution: 0 },
   }))
@@ -50,9 +52,9 @@ export const Player = (props: { gridSize: number }) => {
     api.velocity.subscribe((v) => (state.current.vel = v))
     api.position.subscribe((v) => (state.current.pos = v))
     setTimeout(() => {
-      camera.lookAt(new Vector3(0, p, 0))
+      camera.lookAt(new Vector3(0, 0, 0))
     }, 500)
-  }, [api, camera, p])
+  }, [api, camera])
 
   useFrame((_, delta) => {
     const {
