@@ -467,6 +467,7 @@ export const DefaultScene = (props: {
         <OrbitControls
           enabled
           camera={camera}
+          enablePan={false}
           target={new Vector3(0, 0, 0)}
           minDistance={minDistance}
           maxDistance={minDistance + 10}
