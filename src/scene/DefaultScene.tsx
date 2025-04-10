@@ -292,7 +292,7 @@ export const DefaultScene = (props: {
       }
     },
     // on up
-    (_button, x, y) => {
+    (button, x, y) => {
       // if not orbit mode, mouse up does nothing
       // if frameCount is -1, we've handled a long press action already
       // and should ignore the mouse up
@@ -310,13 +310,17 @@ export const DefaultScene = (props: {
 
       // if we tap a selected cube, reveal it
       const oldCube = ref.current.boxes.find((b) => b.uuid == activeBoxes[0])
-      console.log(newCube, oldCube)
-      if (!oldCube || newCube.uuid !== oldCube.uuid) {
-        onSelectCube(newCube)
-        return
+
+      if (button === 2) {
+        onFlagCube(newCube)
+      } else {
+        if (!oldCube || newCube.uuid !== oldCube.uuid) {
+          onSelectCube(newCube)
+          return
+        }
+        onRevealCube(oldCube)
+        setActiveBoxes([])
       }
-      onRevealCube(oldCube)
-      setActiveBoxes([])
     },
     // on move
     (x, y) => {
