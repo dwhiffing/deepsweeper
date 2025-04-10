@@ -48,6 +48,7 @@ export const DefaultScene = (props: {
 
   const controls = useRef<PointerLockControls>(null)
   const lastUuid = useRef('')
+  const hasAssignedMines = useRef(false)
   const winCheckTriggered = useRef(false)
   const pointerDownPos = useRef({ x: 0, y: 0 })
   const lastPointerPos = useRef({ x: 0, y: 0 })
@@ -105,7 +106,8 @@ export const DefaultScene = (props: {
     if (winCheckTriggered.current || mineStatsStore.getState().spears === 0)
       return
 
-    if (revealed.size === 0) {
+    if (!hasAssignedMines.current) {
+      hasAssignedMines.current = true
       assignMines(gridSize, mineCount, ref.current.cubeMap, activeBoxes[0])
     }
 
@@ -137,13 +139,14 @@ export const DefaultScene = (props: {
     (cube: Cube) => {
       if (winCheckTriggered.current) return
 
-      if (revealed.size === 0) {
+      if (!hasAssignedMines.current) {
+        hasAssignedMines.current = true
         assignMines(gridSize, mineCount, ref.current.cubeMap, activeBoxes[0])
       }
 
       // if you try to reveal a flagged cube, bail
       if (flagged.has(cube.uuid)) {
-        if (orbitMode) {
+        if (orbitMode && mineStatsStore.getState().spears > 0) {
           setFlagged((f) => {
             f.delete(cube.uuid)
             return new Set(f)
