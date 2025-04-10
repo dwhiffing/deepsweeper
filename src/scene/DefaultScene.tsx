@@ -25,7 +25,7 @@ import {
   winSound,
 } from '../utils/audio'
 import { useRefreshRate } from '../hooks/useRefreshRate'
-import { OrbitControls } from '@react-three/drei'
+import { ArcballControls } from '@react-three/drei'
 
 extend({ PointerLockControls })
 
@@ -488,7 +488,7 @@ export const DefaultScene = (props: {
         </group>
       </Physics>
       {orbitMode ? (
-        <OrbitControls
+        <ArcballControls
           enabled
           camera={camera}
           enablePan={false}
