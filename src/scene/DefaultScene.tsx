@@ -101,6 +101,38 @@ export const DefaultScene = (props: {
     setActiveBoxes(highlightUuids.filter(Boolean))
   }, [])
 
+  const onSpearCube = useCallback(() => {
+    if (winCheckTriggered.current || mineStatsStore.getState().spears === 0)
+      return
+
+    if (revealed.size === 0) {
+      assignMines(gridSize, mineCount, ref.current.cubeMap, activeBoxes[0])
+    }
+
+    const cube =
+      ref.current.boxes.find((b) => b.uuid == activeBoxes[0]) ||
+      getCubeAt(lastPointerPos.current.x, lastPointerPos.current.y)
+    const uuid = cube?.uuid
+
+    if (uuid && cube && !flagged.has(uuid) && !revealed.has(uuid)) {
+      if (cube.isMine) {
+        setFlagged((f) => {
+          f.add(uuid)
+          return new Set(f)
+        })
+      } else {
+        setRevealed((r) => {
+          r.add(uuid)
+          return new Set(r)
+        })
+      }
+      playSound(spearSound, 0.9, 1.1, 0.7)
+      mineStatsStore.setState({
+        spears: mineStatsStore.getState().spears - 1,
+      })
+    }
+  }, [activeBoxes, flagged, gridSize, mineCount, revealed, getCubeAt])
+
   const onRevealCube = useCallback(
     (cube: Cube) => {
       if (winCheckTriggered.current) return
@@ -110,7 +142,17 @@ export const DefaultScene = (props: {
       }
 
       // if you try to reveal a flagged cube, bail
-      if (flagged.has(cube.uuid)) return
+      if (flagged.has(cube.uuid)) {
+        if (orbitMode) {
+          setFlagged((f) => {
+            f.delete(cube.uuid)
+            return new Set(f)
+          })
+          onSpearCube()
+        }
+
+        return
+      }
 
       // if you reveal a mine, you lose
       if (cube?.isMine) {
@@ -150,7 +192,16 @@ export const DefaultScene = (props: {
         playSound(clickErrorSound, 0.9, 1.1, 0.4)
       }
     },
-    [activeBoxes, flagged, gridSize, mineCount, onLose, revealed],
+    [
+      activeBoxes,
+      flagged,
+      gridSize,
+      mineCount,
+      onLose,
+      revealed,
+      onSpearCube,
+      orbitMode,
+    ],
   )
 
   const onFlagCube = useCallback(
@@ -194,38 +245,6 @@ export const DefaultScene = (props: {
     },
     [flagged, onLose, revealed],
   )
-
-  const onSpearCube = useCallback(() => {
-    if (winCheckTriggered.current || mineStatsStore.getState().spears === 0)
-      return
-
-    if (revealed.size === 0) {
-      assignMines(gridSize, mineCount, ref.current.cubeMap, activeBoxes[0])
-    }
-
-    const uuid = activeBoxes[0]
-    const cube =
-      ref.current.boxes.find((b) => b.uuid == uuid) ||
-      getCubeAt(lastPointerPos.current.x, lastPointerPos.current.y)
-
-    if (uuid && cube && !flagged.has(uuid) && !revealed.has(uuid)) {
-      if (cube.isMine) {
-        setFlagged((f) => {
-          f.add(uuid)
-          return new Set(f)
-        })
-      } else {
-        setRevealed((r) => {
-          r.add(uuid)
-          return new Set(r)
-        })
-      }
-      playSound(spearSound, 0.9, 1.1, 0.7)
-      mineStatsStore.setState({
-        spears: mineStatsStore.getState().spears - 1,
-      })
-    }
-  }, [activeBoxes, flagged, gridSize, mineCount, revealed, getCubeAt])
 
   // reset stats: spears
   useEffect(() => {
