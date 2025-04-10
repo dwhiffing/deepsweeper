@@ -1,4 +1,4 @@
-export const clickSound2 = new Audio('audio/click-error.mp3')
+export const clickErrorSound = new Audio('audio/click-error.mp3')
 export const clickSound = new Audio('audio/click.mp3')
 export const explosionSound = new Audio('audio/explosion.mp3')
 export const flagSound = new Audio('audio/flag.mp3')
@@ -13,7 +13,7 @@ export const toggleMute = () => {
 }
 
 music.loop = true
-clickSound2.preservesPitch = false
+clickErrorSound.preservesPitch = false
 clickSound.preservesPitch = false
 explosionSound.preservesPitch = false
 flagSound.preservesPitch = false

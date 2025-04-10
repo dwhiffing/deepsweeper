@@ -12,6 +12,7 @@ import { StopWatch } from './components/StopWatch'
 import { MineStats } from './components/MineStats'
 
 export default function App() {
+  const [orbitMode, setOrbitMode] = useState(true)
   const [gameStarted, setGameStarted] = useState(DEBUG)
   const [gameFade, setGameFade] = useState(false)
   const [gameState, setGameState] = useState('')
@@ -76,10 +77,11 @@ export default function App() {
             transitionDuration: `${gameFade ? DUR : DUR / 2}ms`,
           }}
         />
-        <Crosshair />
+        {!orbitMode && <Crosshair />}
       </UI>
       <Canvas style={{ backgroundColor: '#00001c' }}>
         <DefaultScene
+          orbitMode={orbitMode}
           gridSize={gridSize}
           spacing={mineSpacing}
           mineCount={mineCount}
@@ -126,7 +128,7 @@ export default function App() {
               : "Sweep the mines and don't die"}
           </p>
           {gameState === 'win' && <p>Time: {formatTime(lastTime)}</p>}
-          <div>
+          <div className="flex flex-col gap-3">
             <button
               onClick={() => {
                 playSound(clickSound, 0.9, 1.1, 0.35)
@@ -134,6 +136,15 @@ export default function App() {
               }}
             >
               Start Game
+            </button>
+            <button
+              className="bg-transparent! border text-white!"
+              onClick={() => {
+                playSound(clickSound, 0.9, 1.1, 0.35)
+                setOrbitMode(!orbitMode)
+              }}
+            >
+              Orbit mode: {orbitMode ? 'on' : 'off'}
             </button>
           </div>
         </div>

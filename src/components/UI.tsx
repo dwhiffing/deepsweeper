@@ -4,6 +4,7 @@ export const UI = ({ children }: { children: ReactNode }) => {
   return (
     <div
       style={{
+        pointerEvents: 'none',
         position: 'absolute',
         top: '0',
         left: '0',
