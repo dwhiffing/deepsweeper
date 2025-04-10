@@ -14,7 +14,7 @@ import {
   getBoxes,
   mineStatsStore,
 } from '../utils'
-import { DEBUG, FOG_DISTANCE } from '../utils/constants'
+import { DEBUG, FOG_DISTANCE, mineSize, mineSpacing } from '../utils/constants'
 import {
   clickSound,
   clickErrorSound,
@@ -54,6 +54,8 @@ export const DefaultScene = (props: {
   const frameCount = useRef(0)
   const ref = useRef(getBoxes(gridSize, spacing))
   const groupRef = useRef<Group>(null)
+
+  const minDistance = gridSize * (mineSize + mineSpacing)
 
   const onLose = useCallback(() => {
     playSound(explosionSound)
@@ -456,7 +458,13 @@ export const DefaultScene = (props: {
         </group>
       </Physics>
       {orbitMode ? (
-        <OrbitControls enabled camera={camera} target={new Vector3(0, 0, 0)} />
+        <OrbitControls
+          enabled
+          camera={camera}
+          target={new Vector3(0, 0, 0)}
+          minDistance={minDistance}
+          maxDistance={minDistance + 10}
+        />
       ) : (
         // @ts-expect-error pointer lock
         <pointerLockControls ref={controls} args={[camera, gl.domElement]} />
