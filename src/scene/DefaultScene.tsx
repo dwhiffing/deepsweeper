@@ -64,6 +64,43 @@ export const DefaultScene = (props: {
     }, 500)
   }, [onGameOver])
 
+  const getCenterCube = useCallback(() => {
+    if (!groupRef.current) return
+
+    const raycaster = new Raycaster()
+    raycaster.setFromCamera(new Vector2(0, 0), camera)
+    const intersects = raycaster.intersectObjects(groupRef.current.children)
+    const uuid = intersects[0]?.object.uuid ?? ''
+
+    return ref.current.boxes.find((b) => b.uuid === uuid)
+  }, [camera])
+
+  const getCubeAt = useCallback(
+    (_x: number, _y: number) => {
+      if (!groupRef.current) return
+
+      const rect = gl.domElement.getBoundingClientRect()
+      const x = ((_x - rect.left) / rect.width) * 2 - 1
+      const y = -((_y - rect.top) / rect.height) * 2 + 1
+      const raycaster = new Raycaster()
+      raycaster.setFromCamera(new Vector2(x, y), camera)
+      const intersects = raycaster.intersectObjects(groupRef.current.children)
+      const uuid = intersects[0]?.object.uuid ?? ''
+
+      const cube = ref.current.boxes.find((b) => b.uuid === uuid)
+      return cube
+    },
+    [camera, gl.domElement],
+  )
+
+  const onSelectCube = useCallback((cube: Cube, highlightAdjacent = true) => {
+    const adjacent = highlightAdjacent
+      ? getAdjacent(cube, ref.current.cubeMap)
+      : []
+    const highlightUuids = [cube.uuid, ...adjacent.map((c) => c.uuid)]
+    setActiveBoxes(highlightUuids.filter(Boolean))
+  }, [])
+
   const onRevealCube = useCallback(
     (cube: Cube) => {
       if (winCheckTriggered.current) return
@@ -167,7 +204,9 @@ export const DefaultScene = (props: {
     }
 
     const uuid = activeBoxes[0]
-    const cube = ref.current.boxes.find((b) => b.uuid == uuid)
+    const cube =
+      ref.current.boxes.find((b) => b.uuid == uuid) ||
+      getCubeAt(lastPointerPos.current.x, lastPointerPos.current.y)
 
     if (uuid && cube && !flagged.has(uuid) && !revealed.has(uuid)) {
       if (cube.isMine) {
@@ -186,44 +225,7 @@ export const DefaultScene = (props: {
         spears: mineStatsStore.getState().spears - 1,
       })
     }
-  }, [activeBoxes, flagged, gridSize, mineCount, revealed])
-
-  const onSelectCube = useCallback((cube: Cube, highlightAdjacent = true) => {
-    const adjacent = highlightAdjacent
-      ? getAdjacent(cube, ref.current.cubeMap)
-      : []
-    const highlightUuids = [cube.uuid, ...adjacent.map((c) => c.uuid)]
-    setActiveBoxes(highlightUuids.filter(Boolean))
-  }, [])
-
-  const getCenterCube = useCallback(() => {
-    if (!groupRef.current) return
-
-    const raycaster = new Raycaster()
-    raycaster.setFromCamera(new Vector2(0, 0), camera)
-    const intersects = raycaster.intersectObjects(groupRef.current.children)
-    const uuid = intersects[0]?.object.uuid ?? ''
-
-    return ref.current.boxes.find((b) => b.uuid === uuid)
-  }, [camera])
-
-  const getCubeAt = useCallback(
-    (_x: number, _y: number) => {
-      if (!groupRef.current) return
-
-      const rect = gl.domElement.getBoundingClientRect()
-      const x = ((_x - rect.left) / rect.width) * 2 - 1
-      const y = -((_y - rect.top) / rect.height) * 2 + 1
-      const raycaster = new Raycaster()
-      raycaster.setFromCamera(new Vector2(x, y), camera)
-      const intersects = raycaster.intersectObjects(groupRef.current.children)
-      const uuid = intersects[0]?.object.uuid ?? ''
-
-      const cube = ref.current.boxes.find((b) => b.uuid === uuid)
-      return cube
-    },
-    [camera, gl.domElement],
-  )
+  }, [activeBoxes, flagged, gridSize, mineCount, revealed, getCubeAt])
 
   // reset stats: spears
   useEffect(() => {
